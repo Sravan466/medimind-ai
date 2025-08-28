@@ -71,14 +71,14 @@ export default function RootLayout() {
             await medicineLogService.markAsDue(matchingLog.id);
             console.log(`[FIRE_PRIMARY] Marked log ${matchingLog.id} as due`);
             
-            // Schedule the first funny reminder
-            await notificationService.scheduleFunnyReminder(
+            // Start the funny reminder loop
+            await notificationService.repeatFunnyRemindersUntilTaken(
               matchingLog.id,
               data.medicineName,
               data.dosage,
               data.time
             );
-            console.log(`[FIRE_FOLLOWUP] Scheduled first funny reminder for log ${matchingLog.id}`);
+            console.log(`[FIRE_FOLLOWUP] Started funny reminder loop for log ${matchingLog.id}`);
           } else {
             console.log(`[FIRE_PRIMARY] No matching log found for medicine ${data.medicineId} at time ${data.time}`);
           }

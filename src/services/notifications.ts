@@ -515,6 +515,21 @@ export class NotificationService {
     }
   }
 
+  // NEW: Repeat funny reminders until taken/skipped
+  async repeatFunnyRemindersUntilTaken(logId: string, medicineName: string, dosage: string, timeString: string): Promise<void> {
+    try {
+      console.log(`[REPEAT] Starting funny reminder loop for logId: ${logId}`);
+      
+      // Schedule the first funny reminder
+      await this.scheduleFunnyReminder(logId, medicineName, dosage, timeString);
+      
+      // The funny reminder will automatically schedule the next one when it fires
+      // This is handled in the notification listener in _layout.tsx
+    } catch (error) {
+      console.error('[REPEAT] Error starting funny reminder loop:', error);
+    }
+  }
+
   // NEW: Cancel all funny reminders for a specific log
   async cancelFunnyReminders(logId: string): Promise<void> {
     try {
