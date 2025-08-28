@@ -119,6 +119,12 @@ export class MedicineLogService {
 
   async markMedicineAsTaken(logId: string): Promise<boolean> {
     try {
+      console.log(`[MARK_AS_TAKEN] Marking log ${logId} as taken`);
+      
+      // Cancel any funny reminders for this log
+      await notificationService.cancelFunnyReminders(logId);
+      console.log(`[MARK_AS_TAKEN] Cancelled funny reminders for log ${logId}`);
+      
       const { error } = await supabase
         .from('medicine_logs')
         .update({
@@ -128,19 +134,26 @@ export class MedicineLogService {
         .eq('id', logId);
 
       if (error) {
-        console.error('Error marking medicine as taken:', error);
+        console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
         return false;
       }
 
+      console.log(`[MARK_AS_TAKEN] Successfully marked log ${logId} as taken`);
       return true;
     } catch (error) {
-      console.error('Error marking medicine as taken:', error);
+      console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
       return false;
     }
   }
 
   async markMedicineAsSkipped(logId: string): Promise<boolean> {
     try {
+      console.log(`[MARK_AS_SKIPPED] Marking log ${logId} as skipped`);
+      
+      // Cancel any funny reminders for this log
+      await notificationService.cancelFunnyReminders(logId);
+      console.log(`[MARK_AS_SKIPPED] Cancelled funny reminders for log ${logId}`);
+      
       const { error } = await supabase
         .from('medicine_logs')
         .update({
@@ -149,13 +162,14 @@ export class MedicineLogService {
         .eq('id', logId);
 
       if (error) {
-        console.error('Error marking medicine as skipped:', error);
+        console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
         return false;
       }
 
+      console.log(`[MARK_AS_SKIPPED] Successfully marked log ${logId} as skipped`);
       return true;
     } catch (error) {
-      console.error('Error marking medicine as skipped:', error);
+      console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
       return false;
     }
   }
