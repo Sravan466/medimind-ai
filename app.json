@@ -23,7 +23,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2196F3"
       },
-      "package": "com.medimind.ai"
+      "package": "com.medimind.ai",
+      "versionCode": 1,
+      "permissions": [
+        "NOTIFICATIONS",
+        "WAKE_LOCK",
+        "SCHEDULE_EXACT_ALARM",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
