@@ -1,10 +1,52 @@
 {
   "expo": {
-    "scheme": "acme",
-    "plugins": [
-      "expo-router"
+    "name": "MediMind AI",
+    "slug": "medimind-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2196F3"
+    },
+    "assetBundlePatterns": [
+      "**/*"
     ],
-    "name": "MediMindAI",
-    "slug": "MediMindAI"
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.medimind.ai"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2196F3"
+      },
+      "package": "com.medimind.ai"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "medimind",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2196F3",
+          "sounds": ["./assets/notification-sound.wav"]
+        }
+      ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a9acb7f2-eaa5-4c0b-9e9c-f78dccd1feb7"
+      }
+    }
   }
 }
