@@ -111,16 +111,11 @@ export const useNotifications = () => {
 
   const cancelMedicineNotifications = async (medicineId: string): Promise<void> => {
     try {
-      await notificationService.cancelMedicineNotifications(medicineId);
-      
-      // Update scheduled count
-      const scheduledNotifications = await notificationService.getScheduledNotifications();
-      setState(prev => ({
-        ...prev,
-        scheduledCount: scheduledNotifications.length,
-      }));
+      console.log(`[HOOK] Cancelling notifications for medicine ${medicineId}`);
+      await notificationService.cancelDose(medicineId);
+      console.log(`[HOOK] Successfully cancelled notifications for medicine ${medicineId}`);
     } catch (error) {
-      console.error('Error canceling medicine notifications:', error);
+      console.error('[HOOK] Error canceling medicine notifications:', error);
     }
   };
 

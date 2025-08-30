@@ -122,7 +122,7 @@ export class MedicineLogService {
       console.log(`[MARK_AS_TAKEN] Marking log ${logId} as taken`);
       
       // Cancel any funny reminders for this log
-      await notificationService.cancelFunnyReminders(logId);
+      await notificationService.cancelFunnyChain(logId);
       console.log(`[MARK_AS_TAKEN] Cancelled funny reminders for log ${logId}`);
       
       const { error } = await supabase
@@ -151,7 +151,7 @@ export class MedicineLogService {
       console.log(`[MARK_AS_SKIPPED] Marking log ${logId} as skipped`);
       
       // Cancel any funny reminders for this log
-      await notificationService.cancelFunnyReminders(logId);
+      await notificationService.cancelFunnyChain(logId);
       console.log(`[MARK_AS_SKIPPED] Cancelled funny reminders for log ${logId}`);
       
       const { error } = await supabase
@@ -174,6 +174,60 @@ export class MedicineLogService {
     }
   }
 
+  async markAsTaken(logId: string): Promise<boolean> {
+    try {
+      console.log(`[MARK_AS_TAKEN] Marking log ${logId} as taken`);
+      const { error } = await supabase
+        .from('medicine_logs')
+        .update({
+          status: 'taken',
+          taken_time: new Date().toISOString(),
+        })
+        .eq('id', logId);
+
+      if (error) {
+        console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
+        return false;
+      }
+
+      // Cancel all funny reminders for this log
+      await notificationService.cancelFunnyChain(logId);
+
+      console.log(`[MARK_AS_TAKEN] Successfully marked log ${logId} as taken and cancelled funny reminders`);
+      return true;
+    } catch (error) {
+      console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
+      return false;
+    }
+  }
+
+  async markAsSkipped(logId: string): Promise<boolean> {
+    try {
+      console.log(`[MARK_AS_SKIPPED] Marking log ${logId} as skipped`);
+      const { error } = await supabase
+        .from('medicine_logs')
+        .update({
+          status: 'skipped',
+        })
+        .eq('id', logId);
+
+      if (error) {
+        console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
+        return false;
+      }
+
+      // Cancel all funny reminders for this log
+      await notificationService.cancelFunnyChain(logId);
+
+      console.log(`[MARK_AS_SKIPPED] Successfully marked log ${logId} as skipped and cancelled funny reminders`);
+      return true;
+    } catch (error) {
+      console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
+      return false;
+    }
+  }
+
+  // NEW: Mark medicine as due when primary notification fires
   async markAsDue(logId: string): Promise<boolean> {
     try {
       console.log(`[MARK_AS_DUE] Marking log ${logId} as due`);
@@ -197,50 +251,24 @@ export class MedicineLogService {
     }
   }
 
-  async markAsTaken(logId: string): Promise<boolean> {
+  // NEW: Get a specific log by ID
+  async getLog(logId: string): Promise<any> {
     try {
-      console.log(`[MARK_AS_TAKEN] Marking log ${logId} as taken`);
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('medicine_logs')
-        .update({
-          status: 'taken',
-          taken_time: new Date().toISOString(),
-        })
-        .eq('id', logId);
+        .select('*')
+        .eq('id', logId)
+        .single();
 
       if (error) {
-        console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
-        return false;
+        console.error('[GET_LOG] Error getting log:', error);
+        return null;
       }
 
-      console.log(`[MARK_AS_TAKEN] Successfully marked log ${logId} as taken`);
-      return true;
+      return data;
     } catch (error) {
-      console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
-      return false;
-    }
-  }
-
-  async markAsSkipped(logId: string): Promise<boolean> {
-    try {
-      console.log(`[MARK_AS_SKIPPED] Marking log ${logId} as skipped`);
-      const { error } = await supabase
-        .from('medicine_logs')
-        .update({
-          status: 'skipped',
-        })
-        .eq('id', logId);
-
-      if (error) {
-        console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
-        return false;
-      }
-
-      console.log(`[MARK_AS_SKIPPED] Successfully marked log ${logId} as skipped`);
-      return true;
-    } catch (error) {
-      console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
-      return false;
+      console.error('[GET_LOG] Error getting log:', error);
+      return null;
     }
   }
 
@@ -248,8 +276,7 @@ export class MedicineLogService {
     try {
       console.log(`[CANCEL_FUNNY] Cancelling funny reminders for log ${logId}`);
       // This will be handled by the notification service
-      // We just log it here for consistency
-      await notificationService.cancelFunnyReminders(logId);
+      await notificationService.cancelFunnyChain(logId);
     } catch (error) {
       console.error('[CANCEL_FUNNY] Error in cancelFunnyReminders:', error);
     }

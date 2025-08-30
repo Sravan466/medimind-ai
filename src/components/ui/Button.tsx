@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
 
 interface ButtonProps {
@@ -58,8 +59,11 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           ...baseStyle,
           backgroundColor: 'transparent',
-          borderWidth: 2,
-          borderColor: colors.primary[600],
+          borderWidth: 1.5,
+          borderColor: colors.primary[500],
+          borderRadius: 12,
+          paddingVertical: 8,
+          paddingHorizontal: 12,
         };
       case 'text':
         return {
@@ -94,7 +98,9 @@ export const Button: React.FC<ButtonProps> = ({
       case 'outline':
         return {
           ...baseStyle,
-          color: colors.primary[600],
+          color: colors.primary[500],
+          fontSize: 14,
+          fontWeight: '600',
         };
       case 'text':
         return {
@@ -127,9 +133,12 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <>
           {icon && (
-            <Text style={[getLabelStyle(), styles.icon, labelStyle]}>
-              {icon}
-            </Text>
+            <MaterialCommunityIcons 
+              name={icon}
+              size={18}
+              color={variant === 'primary' ? colors.neutral[50] : colors.primary[600]}
+              style={styles.icon}
+            />
           )}
           <Text style={[getLabelStyle(), labelStyle]}>
             {children}
@@ -152,5 +161,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
+    alignSelf: 'center',
   },
 });

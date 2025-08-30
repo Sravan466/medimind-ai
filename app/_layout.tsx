@@ -40,6 +40,9 @@ export default function RootLayout() {
         await healthTipsService.initialize();
         // Alarm service initializes automatically in constructor
         
+        // NEW: Reconcile any missing notifications after app restart
+        await notificationService.reconcile();
+        
         console.log('[INIT] Notification initialization completed');
       } catch (error) {
         console.log('[INIT] Error initializing services:', error);
@@ -54,7 +57,7 @@ export default function RootLayout() {
       
       // Only handle medicine reminders, ignore other notification types
       if (data?.type === 'reminder') {
-        console.log('[FIRE] Primary medicine reminder received:', notification.request.content.title);
+        console.log('[FIRE_PRIMARY] Primary medicine reminder received:', notification.request.content.title);
         
         // Find the log entry for this medicine and time
         try {
@@ -65,20 +68,21 @@ export default function RootLayout() {
           );
           
           if (matchingLog) {
-            console.log(`[FIRE_PRIMARY] Found matching log ${matchingLog.id}, marking as due and scheduling funny reminder`);
+            console.log(`[FIRE_PRIMARY] Found matching log ${matchingLog.id}, marking as due and starting funny reminder loop`);
             
             // Mark as due so it shows in Today Medicines with checkbox
             await medicineLogService.markAsDue(matchingLog.id);
             console.log(`[FIRE_PRIMARY] Marked log ${matchingLog.id} as due`);
             
-            // Start the funny reminder loop
-            await notificationService.repeatFunnyRemindersUntilTaken(
+            // Start the funny reminder loop with 4-minute intervals
+            await notificationService.repeatUntilTaken(
               matchingLog.id,
               data.medicineName,
               data.dosage,
-              data.time
+              data.time,
+              240000 // 4 minutes in milliseconds
             );
-            console.log(`[FIRE_FOLLOWUP] Started funny reminder loop for log ${matchingLog.id}`);
+            console.log(`[FIRE_PRIMARY] Started funny reminder loop for log ${matchingLog.id}`);
           } else {
             console.log(`[FIRE_PRIMARY] No matching log found for medicine ${data.medicineId} at time ${data.time}`);
           }
@@ -86,7 +90,7 @@ export default function RootLayout() {
           console.error('[FIRE_PRIMARY] Error handling primary notification:', error);
         }
       } else if (data?.type === 'funny_reminder') {
-        console.log('[FIRE] Funny reminder received:', notification.request.content.title);
+        console.log(`[FIRE_FUNNY] Funny reminder received (attempt ${data.funnyReminderCount}):`, notification.request.content.title);
         
         // Check if the log is still due (user hasn't taken action yet)
         try {
@@ -94,25 +98,22 @@ export default function RootLayout() {
           console.log(`[FIRE_FUNNY] Checking if log ${logId} is still due`);
           
           // Get the current status of the log
-          const { data: logData, error } = await supabase
-            .from('medicine_logs')
-            .select('status')
-            .eq('id', logId)
-            .single();
+          const logData = await medicineLogService.getLog(logId);
           
-          if (logData && !error && (logData as any).status === 'due') {
+          if (logData && logData.status === 'due') {
             console.log(`[FIRE_FUNNY] Log ${logId} is still due, scheduling next funny reminder`);
             
-            // Schedule the next funny reminder
+            // Schedule the next funny reminder with 4-minute interval
             await notificationService.scheduleFunnyReminder(
               logId,
               data.medicineName,
               data.dosage,
-              data.time
+              data.time,
+              240000 // 4 minutes in milliseconds
             );
             console.log(`[FIRE_FUNNY] Scheduled next funny reminder for log ${logId}`);
           } else {
-            const status = (logData as any)?.status || 'unknown';
+            const status = logData?.status || 'unknown';
             console.log(`[FIRE_FUNNY] Log ${logId} is no longer due (status: ${status}), stopping funny reminders`);
           }
         } catch (error) {

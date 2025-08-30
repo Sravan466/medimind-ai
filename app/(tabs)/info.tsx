@@ -546,7 +546,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   clearButton: {
-    flex: 1,
     borderColor: colors.neutral[300],
   },
   errorCard: {

@@ -36,10 +36,10 @@ export default function TabsLayout() {
           headerTitleStyle: {
             fontWeight: 'bold',
             color: colors.neutral[900],
-            fontSize: 18,
+            fontSize: 16, // Reduced from 18
           },
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: 10, // Reduced from 11
             fontWeight: '500',
             marginTop: 2,
           },
@@ -70,6 +70,11 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="information" size={size} color={color} />
             ),
+            tabBarLabelStyle: {
+              fontSize: 9, // Reduced text size for info tab
+              fontWeight: '500',
+              marginTop: 2,
+            },
           }}
         />
         <Tabs.Screen
@@ -88,6 +93,11 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="account" size={size} color={color} />
             ),
+            tabBarLabelStyle: {
+              fontSize: 9, // Reduced text size for profile tab
+              fontWeight: '500',
+              marginTop: 2,
+            },
           }}
         />
         

@@ -353,7 +353,7 @@ export default function ChatScreen() {
               value={inputText}
               onChangeText={setInputText}
               onSubmitEditing={handleSend}
-              multiline
+              multiline={false}
               maxLength={500}
               style={styles.input}
               contentStyle={styles.inputContentStyle}
@@ -569,11 +569,14 @@ const styles = StyleSheet.create({
   },
   inputContentStyle: {
     paddingVertical: 0,
+    height: 48,
+    justifyContent: 'center',
   },
   input: {
     backgroundColor: colors.neutral[50],
     borderRadius: 20,
     margin: 0,
+    textAlignVertical: 'center',
   },
   errorContainer: {
     flexDirection: 'row',

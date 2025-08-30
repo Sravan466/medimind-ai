@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MediMind AI",
-    "slug": "medimind-ai",
+    "slug": "medimindai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,20 +16,24 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.medimind.ai"
+      "bundleIdentifier": "com.medimind.ai",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#2196F3"
+        "foregroundImage": "./assets/icons/adaptive-foreground.png",
+        "backgroundColor": "#0E77D1"
       },
       "package": "com.medimind.ai",
-      "versionCode": 1,
+      "versionCode": 4,
       "permissions": [
         "NOTIFICATIONS",
         "WAKE_LOCK",
         "SCHEDULE_EXACT_ALARM",
-        "RECEIVE_BOOT_COMPLETED"
+        "RECEIVE_BOOT_COMPLETED",
+        "POST_NOTIFICATIONS"
       ]
     },
     "web": {
