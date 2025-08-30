@@ -112,14 +112,6 @@ export default function HomeScreen() {
               <Text style={styles.userName}>{profile?.full_name || 'User'}</Text>
             </View>
           </View>
-          <View style={styles.headerRight}>
-            <IconButton
-              icon="bell-outline"
-              size={34}
-              iconColor={colors.neutral[600]}
-              onPress={() => router.push('/(tabs)/profile')}
-            />
-          </View>
         </View>
       </View>
 
@@ -172,6 +164,7 @@ export default function HomeScreen() {
                 variant="outline"
                 onPress={refreshTodayMedicines}
                 style={styles.refreshButton}
+                labelStyle={styles.smallButtonText}
               >
                 Refresh
               </Button>
@@ -342,6 +335,7 @@ export default function HomeScreen() {
                  variant="outline"
                  onPress={() => router.push('/(tabs)/medicines')}
                  style={styles.viewAllButton}
+                 labelStyle={styles.smallButtonText}
                >
                  View All
                </Button>
@@ -412,6 +406,7 @@ export default function HomeScreen() {
                      healthTipsService.generateDailyHealthTip(user?.id);
                    }}
                    style={styles.viewAllButton}
+                   labelStyle={styles.smallButtonText}
                  >
                    New Tip
                  </Button>
@@ -460,6 +455,7 @@ export default function HomeScreen() {
               onPress={handleAddMedicine}
               style={styles.addButton}
               labelStyle={styles.addButtonText}
+              icon="plus"
             >
               Add Your First Medicine
             </Button>
@@ -488,7 +484,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.neutral[50],
-    paddingTop: 50, // Safe area for status bar
+    paddingTop: 40, // Reduced from 50 to fix extra white spacing
     paddingBottom: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
@@ -586,6 +582,8 @@ const styles = StyleSheet.create({
   },
   viewAllButton: {
     minWidth: 0,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   actionGrid: {
     flexDirection: 'row',
@@ -676,9 +674,9 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: colors.neutral[700],
+    color: colors.neutral[900],
     marginTop: 16,
     marginBottom: 8,
   },
@@ -691,10 +689,21 @@ const styles = StyleSheet.create({
   },
   addButton: {
     minWidth: 200,
+    backgroundColor: colors.primary[500],
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    elevation: 4,
+    shadowColor: colors.primary[500],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   addButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   healthTipCard: {
     borderRadius: 12,
@@ -752,6 +761,9 @@ const styles = StyleSheet.create({
    refreshButton: {
      minWidth: 0,
      paddingHorizontal: 12,
+   },
+   smallButtonText: {
+     fontSize: 12,
    },
    todayMedicinesList: {
      gap: 12,

@@ -252,14 +252,19 @@ Please respond with only the JSON object.`;
 
   async sendImmediateHealthTip(userId?: string): Promise<HealthTip | null> {
     try {
+      console.log('[HEALTHTIP_SEND] Starting immediate health tip generation for userId:', userId);
+      
       const healthTip = await this.generateDailyHealthTip(userId);
       
       if (!healthTip) {
+        console.log('[HEALTHTIP_SEND] Failed to generate health tip');
         return null;
       }
 
+      console.log('[HEALTHTIP_SEND] Generated health tip:', healthTip.title);
+
       // Send immediate notification
-      await Notifications.scheduleNotificationAsync({
+      const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: healthTip.title,
           body: healthTip.content,
@@ -275,9 +280,10 @@ Please respond with only the JSON object.`;
         } as any,
       });
 
+      console.log('[HEALTHTIP_SEND] Successfully scheduled health tip notification:', notificationId);
       return healthTip;
     } catch (error) {
-      console.error('Error sending immediate health tip:', error);
+      console.error('[HEALTHTIP_SEND] Error sending immediate health tip:', error);
       return null;
     }
   }

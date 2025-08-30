@@ -129,11 +129,11 @@ export default function MedicinesScreen() {
           </View>
           <View style={styles.headerRight}>
             <IconButton
-              icon="plus"
+              icon="plus-circle-outline"
               size={24}
               onPress={handleAddMedicine}
               iconColor={colors.primary[500]}
-              style={styles.addButton}
+              style={styles.headerAddButton}
             />
           </View>
         </View>
@@ -148,12 +148,10 @@ export default function MedicinesScreen() {
       >
         {medicines.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons 
-              name="pill" 
-              size={64} 
-              color={colors.neutral[400]} 
-            />
-            <Text style={styles.emptyTitle}>No medicines yet</Text>
+            <View style={styles.emptyIconContainer}>
+              <Text style={styles.emptyIcon}>💊</Text>
+            </View>
+            <Text style={styles.emptyTitle}>No Medicines Added Yet</Text>
             <Text style={styles.emptySubtitle}>
               Start by adding your first medicine to track your health journey
             </Text>
@@ -162,6 +160,7 @@ export default function MedicinesScreen() {
               onPress={handleAddMedicine}
               style={styles.addButton}
               labelStyle={styles.addButtonText}
+              icon="plus"
             >
               Add Your First Medicine
             </Button>
@@ -257,6 +256,7 @@ export default function MedicinesScreen() {
           style={styles.fab}
           onPress={handleAddMedicine}
           label="Add Medicine"
+          color="#FFFFFF"
         />
       )}
     </View>
@@ -304,11 +304,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  headerAddButton: {
+    margin: 0,
+  },
   addButton: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: colors.primary[500],
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    elevation: 4,
+    shadowColor: colors.primary[500],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   addButtonText: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   scrollView: {
     flex: 1,
@@ -323,10 +337,19 @@ const styles = StyleSheet.create({
     padding: 32,
     marginTop: 40,
   },
+  emptyIconContainer: {
+    backgroundColor: colors.primary[100],
+    borderRadius: 20,
+    padding: 10,
+    marginBottom: 16,
+  },
+  emptyIcon: {
+    fontSize: 48,
+  },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: colors.neutral[700],
+    color: colors.neutral[900],
     marginTop: 16,
     marginBottom: 8,
   },

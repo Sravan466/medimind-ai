@@ -152,11 +152,11 @@ export default function EditMedicineScreen() {
       if (data) {
         try {
           const medicine = data as any; // Type assertion for now
-          console.log(`[EDIT] Updating notifications for ${medicine.name} (ID: ${medicine.id})`);
+          console.log(`[EDIT_RESCHEDULE] Updating notifications for ${medicine.name} (ID: ${medicine.id})`);
           
           // CRITICAL FIX: Cancel old notifications before rescheduling
           console.log(`[CANCEL] Cancelling old notifications for ${medicine.name} (ID: ${medicine.id})`);
-          await notificationService.cancelMedicineNotifications(medicine.id);
+          await notificationService.cancelDose(medicine.id);
           
           // CRITICAL FIX: Clean up old logs for this medicine
           console.log(`[CLEANUP] Cleaning up old logs for ${medicine.name} (ID: ${medicine.id})`);
@@ -174,9 +174,9 @@ export default function EditMedicineScreen() {
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           const notificationIds = await scheduleMedicineReminder(medicine);
-          console.log(`[EDIT] Updated ${notificationIds.length} notifications for ${medicine.name}`);
+          console.log(`[EDIT_RESCHEDULE] Updated ${notificationIds.length} notifications for ${medicine.name}`);
         } catch (notificationError) {
-          console.error('[EDIT] Error updating notifications:', notificationError);
+          console.error('[EDIT_RESCHEDULE] Error updating notifications:', notificationError);
         }
       }
 
