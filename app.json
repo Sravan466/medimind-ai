@@ -2,7 +2,7 @@
   "expo": {
     "name": "MediMind AI",
     "slug": "medimindai",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -27,7 +27,7 @@
         "backgroundColor": "#0E77D1"
       },
       "package": "com.medimind.ai",
-      "versionCode": 5,
+      "versionCode": 6,
       "permissions": [
         "NOTIFICATIONS",
         "WAKE_LOCK",
