@@ -561,7 +561,7 @@ export class NotificationService {
   }
 
   // IMPROVED: Implement stable repeatUntilTaken function
-  async repeatUntilTaken(logId: string, medicineName: string, dosage: string, timeString: string, intervalMs: number = 240000): Promise<void> {
+  async repeatUntilTaken(logId: string, medicineName: string, dosage: string, timeString: string, intervalMs: number = 180000): Promise<void> {
     try {
       console.log(`[REPEAT_UNTIL_TAKEN] Starting repeat loop for logId: ${logId}, interval: ${intervalMs}ms`);
       
@@ -575,7 +575,7 @@ export class NotificationService {
   }
 
   // IMPROVED: Schedule funny reminder with Gemini integration and deterministic IDs
-  async scheduleFunnyReminder(logId: string, medicineName: string, dosage: string, timeString: string, intervalMs: number = 240000): Promise<string | null> {
+  async scheduleFunnyReminder(logId: string, medicineName: string, dosage: string, timeString: string, intervalMs: number = 180000): Promise<string | null> {
     try {
       // Get current funny reminder count for this log
       const currentCount = this.funnyReminderCounts.get(logId) || 0;
