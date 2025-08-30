@@ -27,7 +27,7 @@
         "backgroundColor": "#0E77D1"
       },
       "package": "com.medimind.ai",
-      "versionCode": 4,
+      "versionCode": 5,
       "permissions": [
         "NOTIFICATIONS",
         "WAKE_LOCK",

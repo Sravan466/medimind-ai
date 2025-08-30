@@ -74,13 +74,13 @@ export default function RootLayout() {
             await medicineLogService.markAsDue(matchingLog.id);
             console.log(`[FIRE_PRIMARY] Marked log ${matchingLog.id} as due`);
             
-            // Start the funny reminder loop with 4-minute intervals
+            // Start the funny reminder loop with 3-minute intervals (180000ms)
             await notificationService.repeatUntilTaken(
               matchingLog.id,
               data.medicineName,
               data.dosage,
               data.time,
-              240000 // 4 minutes in milliseconds
+              180000 // 3 minutes in milliseconds
             );
             console.log(`[FIRE_PRIMARY] Started funny reminder loop for log ${matchingLog.id}`);
           } else {
@@ -103,13 +103,13 @@ export default function RootLayout() {
           if (logData && logData.status === 'due') {
             console.log(`[FIRE_FUNNY] Log ${logId} is still due, scheduling next funny reminder`);
             
-            // Schedule the next funny reminder with 4-minute interval
+            // Schedule the next funny reminder with 3-minute interval
             await notificationService.scheduleFunnyReminder(
               logId,
               data.medicineName,
               data.dosage,
               data.time,
-              240000 // 4 minutes in milliseconds
+              180000 // 3 minutes in milliseconds
             );
             console.log(`[FIRE_FUNNY] Scheduled next funny reminder for log ${logId}`);
           } else {
