@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MediMind AI Logo](./assets/icon.png)
+<img src="./assets/icon.png" alt="MediMind AI Logo" width="80" height="80">
 
 **AI-powered Medicine Reminder & Information App**
 
@@ -30,7 +30,7 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 - **💬 AI Chatbot**: Ask questions about medicines and get instant, reliable answers
 - **📊 Medicine Tracking**: Track your medication history and adherence
 - **🔔 Customizable Notifications**: Set up personalized reminder schedules
-- **📱 Cross-Platform**: Works on iOS, Android, and Web
+- **📱 Android App**: Optimized for Android devices
 
 ## ✨ Features
 
@@ -71,37 +71,22 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 ### Get MediMind AI on Your Device
 
 [![Download APK](https://img.shields.io/badge/Download_APK-Android-green?style=for-the-badge&logo=android)](https://www.mediafire.com/file/sutieqbvsi6uvk0/application-dca04daa-a0a2-42b8-acc2-b39153284ca7.apk/file)
-[![Expo Go](https://img.shields.io/badge/Expo_Go-000000?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/client)
-[![Try on Web](https://img.shields.io/badge/Web-App-blue?style=for-the-badge&logo=web)](https://medimind-ai.vercel.app)
 
 ### 📱 How to Install
 
-#### For Android Users:
 1. **Download APK** from the link above
 2. **Enable "Install from Unknown Sources"** in your device settings
 3. **Install the APK** and start using MediMind AI
-
-#### For Development/Testing:
-1. **Install Expo Go** from your device's app store
-2. **Scan the QR code** below or use the direct link
-3. **Open in Expo Go** to start using MediMind AI
 
 </div>
 
 ### 🔗 Download Links
 
 - **[📱 APK Download](https://www.mediafire.com/file/sutieqbvsi6uvk0/application-dca04daa-a0a2-42b8-acc2-b39153284ca7.apk/file)** - Direct APK download for Android
-- **[Expo Go App](https://expo.dev/client)** - Required for development/testing
-- **[Direct Expo Link](https://expo.dev/@sravan466/medimindai)** - Open directly in Expo Go
-- **[Web Version](https://medimind-ai.vercel.app)** - Use in your browser
 
 ### 📋 System Requirements
 
-- **Android APK**: Android 8.0 (API level 26) or later
-- **iOS**: iOS 13.0 or later with Expo Go app
-- **Android (Development)**: Android 8.0 (API level 26) or later with Expo Go app
-- **Web**: Modern browsers (Chrome, Safari, Firefox, Edge)
-- **Expo Go**: Latest version from App Store or Google Play (for development)
+- **Android**: Android 8.0 (API level 26) or later
 
 ## 🚀 Installation
 
@@ -144,18 +129,13 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 5. **Run on your device**
    - Install the Expo Go app on your phone
    - Scan the QR code from the terminal
-   - Or press `i` for iOS simulator or `a` for Android emulator
+   - Or press `a` for Android emulator
 
 ### Building for Production
 
 #### Android
 ```bash
 npx eas build --platform android
-```
-
-#### iOS
-```bash
-npx eas build --platform ios
 ```
 
 #### Web
@@ -203,19 +183,19 @@ npm run deploy
 <div align="center">
 
 ### Home Dashboard
-![Home Dashboard](./screenshots/dashboard.jpg)
+<img src="./screenshots/dashboard.jpg" alt="Home Dashboard" width="200" height="400">
 
 ### Medicine Management
-![Medicine Management](./screenshots/medicines.jpg)
+<img src="./screenshots/medicines.jpg" alt="Medicine Management" width="200" height="400">
 
 ### AI Chatbot
-![AI Chatbot](./screenshots/chat.jpg)
+<img src="./screenshots/chat.jpg" alt="AI Chatbot" width="200" height="400">
 
 ### Medicine Information
-![Medicine Information](./screenshots/info.jpg)
+<img src="./screenshots/info.jpg" alt="Medicine Information" width="200" height="400">
 
 ### Profile & Settings
-![Profile Settings](./screenshots/profile.jpg)
+<img src="./screenshots/profile.jpg" alt="Profile Settings" width="200" height="400">
 
 </div>
 
@@ -401,8 +381,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for better health management**
 
-[![Expo Go](https://img.shields.io/badge/Expo_Go-000000?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/client)
-[![Try on Web](https://img.shields.io/badge/Web-App-blue?style=for-the-badge&logo=web)](https://medimind-ai.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/Sravan466/medimind-ai)
 
 </div>
