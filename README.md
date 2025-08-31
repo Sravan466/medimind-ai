@@ -92,7 +92,7 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 
 - **[📱 APK Download](https://www.mediafire.com/file/sutieqbvsi6uvk0/application-dca04daa-a0a2-42b8-acc2-b39153284ca7.apk/file)** - Direct APK download for Android
 - **[Expo Go App](https://expo.dev/client)** - Required for development/testing
-- **[Direct Expo Link](https://expo.dev/@yourusername/medimindai)** - Open directly in Expo Go
+- **[Direct Expo Link](https://expo.dev/@sravan466/medimindai)** - Open directly in Expo Go
 - **[Web Version](https://medimind-ai.vercel.app)** - Use in your browser
 
 ### 📋 System Requirements
@@ -115,7 +115,7 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/medimind-ai.git
+   git clone https://github.com/Sravan466/medimind-ai.git
    cd medimind-ai
    ```
 
@@ -372,8 +372,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Email**: support@medimind.ai
-- **Issues**: [GitHub Issues](https://github.com/yourusername/medimind-ai/issues)
-- **Documentation**: [Wiki](https://github.com/yourusername/medimind-ai/wiki)
+- **Issues**: [GitHub Issues](https://github.com/Sravan466/medimind-ai/issues)
+- **Documentation**: [Wiki](https://github.com/Sravan466/medimind-ai/wiki)
 
 ## 🔮 Roadmap
 
@@ -403,6 +403,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [![Expo Go](https://img.shields.io/badge/Expo_Go-000000?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/client)
 [![Try on Web](https://img.shields.io/badge/Web-App-blue?style=for-the-badge&logo=web)](https://medimind-ai.vercel.app)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/yourusername/medimind-ai)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/Sravan466/medimind-ai)
 
 </div>
