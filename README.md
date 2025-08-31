@@ -1,8 +1,8 @@
-# 🏥 MediMind AI
+# <img src="./assets/icon.png" alt="MediMind AI Logo" width="70" height="70"> MediMind AI
 
 <div align="center">
 
-<img src="./assets/icon.png" alt="MediMind AI Logo" width="80" height="80">
+
 
 **AI-powered Medicine Reminder & Information App**
 
