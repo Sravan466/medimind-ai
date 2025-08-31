@@ -1,4 +1,4 @@
-# <img src="./assets/icon.png" alt="MediMind AI Logo" width="70" height="70"> MediMind AI
+# <img src="./assets/icon.png" alt="MediMind AI Logo" width="70" height="70" style="border-radius: 15px; vertical-align: middle; margin-right: 10px;"> MediMind AI
 
 <div align="center">
 
