@@ -1,4 +1,4 @@
-# <img src="./assets/icon.png" alt="MediMind AI Logo" width="70" height="70" style="border-radius: 15px; vertical-align: middle; margin-right: 10px;"> MediMind AI
+# <img src="./assets/icon.png" alt="MediMind AI Logo" width="70" height="50" style="border-radius: 15px; vertical-align: middle; margin-right: 10px;"> MediMind AI
 
 <div align="center">
 
@@ -43,7 +43,6 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 ### 💊 Medicine Management
 - **Add Medicines**: Simple form to add new medicines with dosage and timing
 - **Edit & Delete**: Modify medicine details or remove from schedule
-- **Image Support**: Add photos of your medicines for easy identification
 - **Notes**: Add personal notes for each medicine
 
 ### 🤖 AI Medicine Information
@@ -63,6 +62,30 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 - **Repeat Schedules**: Configure daily, weekly, or custom repeat patterns
 - **Snooze Options**: Snooze notifications when needed
 - **Missed Dose Alerts**: Get notified about missed doses
+
+
+## 📸 Screenshots
+
+<div align="center">
+
+### Home Dashboard
+<img src="./screenshots/dashboard.jpg" alt="Home Dashboard" width="200" height="400">
+
+### Medicine Management
+<img src="./screenshots/medicines.jpg" alt="Medicine Management" width="200" height="400">
+
+### AI Chatbot
+<img src="./screenshots/chat.jpg" alt="AI Chatbot" width="200" height="400">
+
+### Medicine Information
+<img src="./screenshots/info.jpg" alt="Medicine Information" width="200" height="400">
+
+### Profile & Settings
+<img src="./screenshots/profile.jpg" alt="Profile Settings" width="200" height="400">
+
+</div>
+
+*Note: Screenshots will be added once the app is fully developed and tested*
 
 ## 📱 Download
 
@@ -178,28 +201,7 @@ npm run deploy
    - Dosage guidelines
    - Drug interactions
 
-## 📸 Screenshots
 
-<div align="center">
-
-### Home Dashboard
-<img src="./screenshots/dashboard.jpg" alt="Home Dashboard" width="200" height="400">
-
-### Medicine Management
-<img src="./screenshots/medicines.jpg" alt="Medicine Management" width="200" height="400">
-
-### AI Chatbot
-<img src="./screenshots/chat.jpg" alt="AI Chatbot" width="200" height="400">
-
-### Medicine Information
-<img src="./screenshots/info.jpg" alt="Medicine Information" width="200" height="400">
-
-### Profile & Settings
-<img src="./screenshots/profile.jpg" alt="Profile Settings" width="200" height="400">
-
-</div>
-
-*Note: Screenshots will be added once the app is fully developed and tested*
 
 ## 🛠️ Tech Stack
 
