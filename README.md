@@ -1,11 +1,13 @@
 <div align="center">
-<table>
-  <tr>
-    <td><img src="./assets/icon.png" alt="MediMind AI Logo" width="40" height="40"></td>
-    <td><b>MediMind AI</b></td>
-  </tr>
-</table>
+  <table>
+    <tr>
+      <td><img src="./assets/icon.png" alt="MediMind AI Logo" width="80"></td>
+      <td><h1 style="font-size: 40px;">MediMind AI</h1></td>
+    </tr>
+  </table>
+  <p><em>AI-powered Medicine Reminder & Information App</em></p>
 </div>
+
 
 
 <div align="center">
