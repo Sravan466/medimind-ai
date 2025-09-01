@@ -1,4 +1,10 @@
-# <img src="./assets/icon.png" alt="MediMind AI Logo" width="70" height="50" style="border-radius: 15px; vertical-align: middle; margin-right: 10px;"> MediMind AI
+<table>
+  <tr>
+    <td><img src="./assets/icon.png" alt="MediMind AI Logo" width="40" height="40"></td>
+    <td><b>MediMind AI</b></td>
+  </tr>
+</table>
+
 
 <div align="center">
 
