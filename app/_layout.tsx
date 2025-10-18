@@ -8,10 +8,11 @@ import { useAppTheme } from '../src/styles/theme';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { SettingsProvider, useSettingsContext } from '../src/contexts/SettingsContext';
 
-import { notificationService } from '../src/services/notifications';
+import { fixedNotificationService } from '../src/services/notifications_fixed';
 import { healthTipsService } from '../src/services/healthTips';
 import { medicineLogService } from '../src/services/medicineLogService';
 import { supabase } from '../src/services/supabase';
+import { NotificationMigration } from '../src/utils/notificationMigration';
 
 // Theme wrapper component
 function ThemedApp({ children }: { children: React.ReactNode }) {
@@ -32,16 +33,19 @@ export default function RootLayout() {
       try {
         console.log('[INIT] Starting notification initialization...');
         
-        // Clear ALL existing notifications to prevent cascades
-        await notificationService.cancelAllNotifications();
-        console.log('[INIT] Cleared all existing notifications');
+        // Check if migration is needed
+        const migrationComplete = await NotificationMigration.isMigrationComplete();
+        if (!migrationComplete) {
+          await NotificationMigration.migrateToFixedSystem();
+        }
         
-        await notificationService.initialize();
+        // Initialize services
+        await fixedNotificationService.initialize();
         await healthTipsService.initialize();
-        // Alarm service initializes automatically in constructor
         
-        // NEW: Reconcile any missing notifications after app restart
-        await notificationService.reconcile();
+        // Reconcile and cleanup
+        await fixedNotificationService.reconcileNotifications();
+        await fixedNotificationService.cleanupOldNotifications();
         
         console.log('[INIT] Notification initialization completed');
       } catch (error) {
@@ -51,77 +55,41 @@ export default function RootLayout() {
 
 
     
-    // Single notification listener for handling medicine reminders
+    // FIXED: Simplified notification listener to prevent cascading issues
     const notificationListener = Notifications.addNotificationReceivedListener(async (notification) => {
       const data = notification.request.content.data as any;
       
-      // Only handle medicine reminders, ignore other notification types
       if (data?.type === 'reminder') {
-        console.log('[FIRE_PRIMARY] Primary medicine reminder received:', notification.request.content.title);
+        console.log('[FIRE] Medicine reminder received:', notification.request.content.title);
         
         // Find the log entry for this medicine and time
         try {
-          console.log(`[FIRE_PRIMARY] Looking for medicine ${data.medicineId} at time ${data.time}`);
           const pendingMedicines = await medicineLogService.getPendingMedicinesByMedicineId(data.medicineId, data.time);
-          const matchingLog = pendingMedicines.find(med => 
-            med.medicineId === data.medicineId
-          );
+          const matchingLog = pendingMedicines.find(med => med.medicineId === data.medicineId);
           
           if (matchingLog) {
-            console.log(`[FIRE_PRIMARY] Found matching log ${matchingLog.id}, marking as due and starting funny reminder loop`);
+            console.log(`[FIRE] Found matching log ${matchingLog.id}, marking as due`);
             
             // Mark as due so it shows in Today Medicines with checkbox
             await medicineLogService.markAsDue(matchingLog.id);
-            console.log(`[FIRE_PRIMARY] Marked log ${matchingLog.id} as due`);
             
-            // Start the funny reminder loop with 3-minute intervals (180000ms)
-            await notificationService.repeatUntilTaken(
+            // FIXED: Schedule only ONE follow-up reminder (no cascading)
+            await fixedNotificationService.scheduleFollowupReminder(
               matchingLog.id,
               data.medicineName,
               data.dosage,
-              data.time,
-              180000 // 3 minutes in milliseconds
+              data.time
             );
-            console.log(`[FIRE_PRIMARY] Started funny reminder loop for log ${matchingLog.id}`);
-          } else {
-            console.log(`[FIRE_PRIMARY] No matching log found for medicine ${data.medicineId} at time ${data.time}`);
-          }
-        } catch (error) {
-          console.error('[FIRE_PRIMARY] Error handling primary notification:', error);
-        }
-      } else if (data?.type === 'funny_reminder') {
-        console.log(`[FIRE_FUNNY] Funny reminder received (attempt ${data.funnyReminderCount}):`, notification.request.content.title);
-        
-        // Check if the log is still due (user hasn't taken action yet)
-        try {
-          const logId = data.logId;
-          console.log(`[FIRE_FUNNY] Checking if log ${logId} is still due`);
-          
-          // Get the current status of the log
-          const logData = await medicineLogService.getLog(logId);
-          
-          if (logData && logData.status === 'due') {
-            console.log(`[FIRE_FUNNY] Log ${logId} is still due, scheduling next funny reminder`);
             
-            // Schedule the next funny reminder with 3-minute interval
-            await notificationService.scheduleFunnyReminder(
-              logId,
-              data.medicineName,
-              data.dosage,
-              data.time,
-              180000 // 3 minutes in milliseconds
-            );
-            console.log(`[FIRE_FUNNY] Scheduled next funny reminder for log ${logId}`);
-          } else {
-            const status = logData?.status || 'unknown';
-            console.log(`[FIRE_FUNNY] Log ${logId} is no longer due (status: ${status}), stopping funny reminders`);
+            console.log(`[FIRE] Scheduled single follow-up for log ${matchingLog.id}`);
           }
         } catch (error) {
-          console.error('[FIRE_FUNNY] Error handling funny reminder:', error);
+          console.error('[FIRE] Error handling notification:', error);
         }
-      } else {
-        // Log other notification types but don't process them
-        console.log('[FIRE] Other notification received:', notification.request.content.title, 'Type:', data?.type);
+      } else if (data?.type === 'followup') {
+        console.log('[FIRE] Follow-up reminder received:', notification.request.content.title);
+        // Follow-up notifications don't trigger additional notifications
+        // User needs to manually mark as taken in the app
       }
     });
 

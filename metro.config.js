@@ -5,6 +5,7 @@ const defaultConfig = getDefaultConfig(__dirname, {
   isCSSEnabled: true,
 });
 
-defaultConfig.resolver.sourceExts = ['jsx', 'js', 'ts', 'tsx', 'json'];
+// Don't override the default extensions, just use the defaults from Expo
+// defaultConfig.resolver.sourceExts = ['jsx', 'js', 'ts', 'tsx', 'json'];
 
 module.exports = defaultConfig;

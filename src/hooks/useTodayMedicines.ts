@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { medicineLogService, TodayMedicine } from '../services/medicineLogService';
-import { notificationService } from '../services/notifications';
+import { fixedNotificationService } from '../services/notifications_fixed';
 
 export const useTodayMedicines = () => {
   const { user } = useAuthContext();
@@ -37,9 +37,9 @@ export const useTodayMedicines = () => {
       console.log(`[TAKEN] Marking medicine as taken (logId: ${logId})`);
       const success = await medicineLogService.markMedicineAsTaken(logId);
       if (success) {
-        // Cancel any funny reminders for this medicine
-        await notificationService.cancelFunnyReminders(logId);
-        console.log(`[TAKEN] Cancelled funny reminders for logId: ${logId}`);
+        // Cancel any follow-up reminders for this medicine
+        await fixedNotificationService.cancelFollowupReminders(logId);
+        console.log(`[TAKEN] Cancelled follow-up reminders for logId: ${logId}`);
         
         // Update local state
         setTodayMedicines(prev => 
@@ -62,9 +62,9 @@ export const useTodayMedicines = () => {
       console.log(`[SKIPPED] Marking medicine as skipped (logId: ${logId})`);
       const success = await medicineLogService.markMedicineAsSkipped(logId);
       if (success) {
-        // Cancel any funny reminders for this medicine
-        await notificationService.cancelFunnyReminders(logId);
-        console.log(`[SKIPPED] Cancelled funny reminders for logId: ${logId}`);
+        // Cancel any follow-up reminders for this medicine
+        await fixedNotificationService.cancelFollowupReminders(logId);
+        console.log(`[SKIPPED] Cancelled follow-up reminders for logId: ${logId}`);
         
         // Update local state
         setTodayMedicines(prev => 

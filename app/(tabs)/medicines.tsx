@@ -43,7 +43,30 @@ export default function MedicinesScreen() {
         return;
       }
       
-      setMedicines(data || []);
+      const medicines = data || [];
+      setMedicines(medicines);
+      
+      // Schedule notifications for all active medicines
+      // This ensures notifications work after app restart or migration
+      const activeMedicines = medicines.filter(m => m.is_active);
+      if (activeMedicines.length > 0) {
+        console.log(`[MEDICINES] Scheduling notifications for ${activeMedicines.length} active medicines`);
+        
+        // Import the fixed notification service
+        const { fixedNotificationService } = await import('../../src/services/notifications_fixed');
+        
+        // Schedule notifications for each active medicine with a small delay
+        for (const medicine of activeMedicines) {
+          try {
+            await fixedNotificationService.scheduleMedicineReminder(medicine);
+            console.log(`[MEDICINES] Scheduled notifications for medicine ID: ${medicine.id}`);
+            // Small delay to prevent overwhelming the system
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } catch (notificationError) {
+            console.error(`[MEDICINES] Error scheduling notifications for medicine ID: ${medicine.id}`, notificationError);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error loading medicines:', error);
     } finally {

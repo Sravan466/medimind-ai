@@ -30,6 +30,10 @@ export class AIService {
 
   private constructor() {
     this.geminiApiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+    console.log('[AI_SERVICE] Gemini API Key available:', !!this.geminiApiKey);
+    if (this.geminiApiKey) {
+      console.log('[AI_SERVICE] API Key length:', this.geminiApiKey.length);
+    }
   }
 
   static getInstance(): AIService {
@@ -79,22 +83,30 @@ export class AIService {
 
   async getMedicineInfo(medicineName: string): Promise<AIResponse> {
     try {
+      console.log(`[MEDICINE_INFO] Getting info for: ${medicineName}`);
+      
       // Try Gemini API
-      if (this.geminiApiKey) {
-        console.log('Trying Gemini API...');
-        const response = await this.queryGemini(medicineName);
-        if (response.success) {
-          console.log('Gemini API successful');
-          return response;
+      if (this.geminiApiKey && this.geminiApiKey.trim().length > 0) {
+        console.log('[MEDICINE_INFO] Trying Gemini API...');
+        try {
+          const response = await this.queryGemini(medicineName);
+          if (response.success && response.data) {
+            console.log('[MEDICINE_INFO] Gemini API successful');
+            return response;
+          }
+          console.log('[MEDICINE_INFO] Gemini API returned no data');
+        } catch (apiError) {
+          console.error('[MEDICINE_INFO] Gemini API error:', apiError);
         }
-        console.log('Gemini API failed, using mock data...');
+      } else {
+        console.log('[MEDICINE_INFO] No Gemini API key available');
       }
 
-      // If no API key or failed, return mock data
-      console.log('Using mock data for demonstration');
+      // Fallback to mock data
+      console.log('[MEDICINE_INFO] Using mock data');
       return this.getMockMedicineInfo(medicineName);
     } catch (error) {
-      console.error('Error getting medicine info:', error);
+      console.error('[MEDICINE_INFO] Error getting medicine info:', error);
       return {
         success: false,
         error: 'Failed to get medicine information. Please try again.',
@@ -105,35 +117,43 @@ export class AIService {
   // Enhanced chat response that includes user's medicine context
   async getChatResponse(message: string, userId: string): Promise<string> {
     try {
+      console.log('[AI_SERVICE] Getting chat response for message:', message.substring(0, 50) + '...');
+      
       // Get user's medicines for context
       const userMedicines = await this.getUserMedicines(userId);
+      console.log('[AI_SERVICE] User has', userMedicines.length, 'medicines');
       
       // Try Gemini API with medicine context
-      if (this.geminiApiKey) {
-        console.log('Trying Gemini API for chat with medicine context...');
+      if (this.geminiApiKey && this.geminiApiKey.trim().length > 0) {
+        console.log('[AI_SERVICE] Attempting Gemini API call...');
         try {
           const response = await this.queryGeminiChatWithContext(message, userId, userMedicines);
-          if (response) {
-            console.log('Gemini chat API successful');
+          if (response && response.trim().length > 0) {
+            console.log('[AI_SERVICE] Gemini API successful, response length:', response.length);
             return response;
           }
+          console.log('[AI_SERVICE] Gemini API returned empty response');
         } catch (apiError: any) {
-          console.error('Gemini API error in chat:', apiError);
+          console.error('[AI_SERVICE] Gemini API error:', apiError.message || apiError);
           
-          // Handle rate limiting specifically
-          if (apiError.message?.includes('Rate limit exceeded')) {
-            return 'I\'m currently experiencing high traffic. Please wait a moment and try again, or I can provide general information without using the AI service.';
+          // Handle specific error cases
+          if (apiError.response?.status === 400) {
+            console.log('[AI_SERVICE] API key invalid, falling back to mock');
+          } else if (apiError.response?.status === 429) {
+            return 'I\'m currently experiencing high traffic. Please wait a moment and try again.';
+          } else if (apiError.response?.status === 403) {
+            console.log('[AI_SERVICE] API access forbidden, falling back to mock');
           }
-          
-          console.log('Gemini chat API failed, falling back to mock response...');
         }
+      } else {
+        console.log('[AI_SERVICE] No valid Gemini API key, using mock response');
       }
 
-      // If no API key or failed, return mock response with medicine context
-      console.log('Using mock chat response with medicine context for demonstration');
+      // Fallback to mock response with medicine context
+      console.log('[AI_SERVICE] Using mock chat response');
       return this.getMockChatResponseWithContext(message, userMedicines);
     } catch (error) {
-      console.error('Error getting chat response:', error);
+      console.error('[AI_SERVICE] Error in getChatResponse:', error);
       return 'I apologize, but I encountered an error. Please try again or rephrase your question.';
     }
   }
@@ -147,11 +167,15 @@ export class AIService {
       
       const prompt = this.buildMedicinePrompt(medicineName);
       
-      // Debug: Log the API key (first 10 characters for security)
-      console.log('Gemini API Key (first 10 chars):', this.geminiApiKey?.substring(0, 10) + '...');
+      // Validate API key format
+      if (!this.geminiApiKey || this.geminiApiKey.length < 30) {
+        throw new Error('Invalid Gemini API key format');
+      }
+      
+      console.log('[GEMINI] Making API request to Gemini...');
       
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.geminiApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
         {
           contents: [
             {
@@ -213,19 +237,27 @@ export class AIService {
   }
 
   private buildMedicinePrompt(medicineName: string): string {
-    return `Please provide information about the medicine "${medicineName}" in the following JSON format:
+    return `Please provide detailed information about the medicine "${medicineName}". Structure your response with clear sections:
 
-{
-  "medicineName": "${medicineName}",
-  "uses": "What is this medicine used for?",
-  "sideEffects": "What are the common side effects?",
-  "description": "Brief description of the medicine",
-  "dosageInfo": "General dosage information and instructions",
-  "interactions": "Drug interactions and contraindications",
-  "warnings": "Important warnings and precautions"
-}
+DESCRIPTION:
+[Brief description of what this medicine is and what it does]
 
-Please provide accurate, medical information. If you're not sure about specific details, mention that this is general information and that users should consult their healthcare provider.`;
+USES:
+[What conditions this medicine treats and how it works]
+
+SIDE EFFECTS:
+[Common and serious side effects to watch for]
+
+DOSAGE INFORMATION:
+[Typical dosing instructions and administration guidelines]
+
+DRUG INTERACTIONS:
+[Important drug interactions and contraindications]
+
+WARNINGS:
+[Critical warnings, precautions, and safety information]
+
+Please provide accurate medical information. Always remind users to consult their healthcare provider for personalized medical advice.`;
   }
 
   private async queryGeminiChatWithContext(message: string, userId: string, userMedicines: Medicine[]): Promise<string> {
@@ -247,7 +279,7 @@ Please provide a helpful, accurate, and personalized response. If the user asks 
 Always remind users to consult with their healthcare provider for medical advice.`;
 
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.geminiApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
         {
           contents: [
             {
@@ -430,54 +462,153 @@ What specific information would you like about your medicines?`;
 
   private parseAIResponse(content: string, medicineName: string): AIResponse {
     try {
+      console.log('[AI_PARSE] Raw content:', content.substring(0, 200) + '...');
+      
       // Try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        return {
-          success: true,
-          data: {
-            medicineName: parsed.medicineName || medicineName,
-            uses: parsed.uses || 'Information not available',
-            sideEffects: parsed.sideEffects || 'Information not available',
-            description: parsed.description || 'Information not available',
-            dosageInfo: parsed.dosageInfo || 'Information not available',
-            interactions: parsed.interactions || 'Information not available',
-            warnings: parsed.warnings || 'Information not available',
-          },
-        };
+        try {
+          const parsed = JSON.parse(jsonMatch[0]);
+          console.log('[AI_PARSE] Successfully parsed JSON');
+          return {
+            success: true,
+            data: {
+              medicineName: parsed.medicineName || medicineName,
+              uses: parsed.uses || 'Information not available. Please consult your healthcare provider.',
+              sideEffects: parsed.sideEffects || 'Information not available. Please consult your healthcare provider.',
+              description: parsed.description || 'Information not available. Please consult your healthcare provider.',
+              dosageInfo: parsed.dosageInfo || 'Information not available. Please consult your healthcare provider.',
+              interactions: parsed.interactions || 'Information not available. Please consult your healthcare provider.',
+              warnings: parsed.warnings || 'Information not available. Please consult your healthcare provider.',
+            },
+          };
+        } catch (jsonError) {
+          console.log('[AI_PARSE] JSON parsing failed, using text parsing');
+        }
       }
 
-      // If no JSON found, return structured text
-      return {
-        success: true,
-        data: {
-          medicineName,
-          uses: 'Please consult your healthcare provider for specific information about uses.',
-          sideEffects: 'Please consult your healthcare provider for information about side effects.',
-          description: content.substring(0, 200) + '...',
-          dosageInfo: 'Please consult your healthcare provider for dosage information.',
-          interactions: 'Please consult your healthcare provider for interaction information.',
-          warnings: 'Please consult your healthcare provider for warnings and precautions.',
-        },
-      };
+      // If JSON parsing fails, try to extract structured information from text
+      const structuredData = this.parseTextResponse(content, medicineName);
+      if (structuredData) {
+        return { success: true, data: structuredData };
+      }
+
+      // Final fallback
+      console.log('[AI_PARSE] Using fallback mock data');
+      return this.getMockMedicineInfo(medicineName);
     } catch (error) {
-      console.error('Error parsing AI response:', error);
+      console.error('[AI_PARSE] Error parsing AI response:', error);
       return this.getMockMedicineInfo(medicineName);
     }
   }
+  
+  private parseTextResponse(content: string, medicineName: string): MedicineInfo | null {
+    try {
+      console.log('[AI_PARSE] Parsing text response for:', medicineName);
+      
+      // Remove any JSON markers or code blocks
+      const cleanContent = content.replace(/```json|```|\*\*|\*/g, '').trim();
+      
+      // If content looks like raw JSON string, don't show it
+      if (cleanContent.startsWith('{') && cleanContent.includes('"medicineName"')) {
+        console.log('[AI_PARSE] Detected raw JSON, rejecting');
+        return null;
+      }
+      
+      // Extract sections using the new structured format
+      const sections = {
+        description: this.extractStructuredSection(cleanContent, 'DESCRIPTION'),
+        uses: this.extractStructuredSection(cleanContent, 'USES'),
+        sideEffects: this.extractStructuredSection(cleanContent, 'SIDE EFFECTS'),
+        dosageInfo: this.extractStructuredSection(cleanContent, 'DOSAGE INFORMATION'),
+        interactions: this.extractStructuredSection(cleanContent, 'DRUG INTERACTIONS'),
+        warnings: this.extractStructuredSection(cleanContent, 'WARNINGS')
+      };
+      
+      // If we got good structured data, use it
+      if (sections.description || sections.uses) {
+        console.log('[AI_PARSE] Successfully extracted structured sections');
+        return {
+          medicineName,
+          description: sections.description || `Information about ${medicineName}. Please consult your healthcare provider for detailed information.`,
+          uses: sections.uses || 'Please consult your healthcare provider for information about uses.',
+          sideEffects: sections.sideEffects || 'Please consult your healthcare provider for information about side effects.',
+          dosageInfo: sections.dosageInfo || 'Please consult your healthcare provider for dosage information.',
+          interactions: sections.interactions || 'Please consult your healthcare provider for interaction information.',
+          warnings: sections.warnings || 'Please consult your healthcare provider for warnings and precautions.',
+        };
+      }
+      
+      console.log('[AI_PARSE] No structured sections found');
+      return null;
+    } catch (error) {
+      console.error('[AI_PARSE] Error parsing text response:', error);
+      return null;
+    }
+  }
+  
+  private extractStructuredSection(content: string, sectionName: string): string | null {
+    try {
+      // Look for section headers like "DESCRIPTION:" or "USES:"
+      const regex = new RegExp(`${sectionName}:\s*\n?([\s\S]*?)(?=\n[A-Z\s]+:|$)`, 'i');
+      const match = content.match(regex);
+      
+      if (match && match[1]) {
+        const sectionContent = match[1].trim();
+        // Clean up the content
+        return sectionContent.replace(/\[.*?\]/g, '').trim();
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('[AI_PARSE] Error extracting section:', sectionName, error);
+      return null;
+    }
+  }
+  
+  private extractSection(content: string, keywords: string[]): string | null {
+    for (const keyword of keywords) {
+      const regex = new RegExp(`${keyword}[:\s]*([^\n]{50,200})`, 'i');
+      const match = content.match(regex);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+    return null;
+  }
 
   private getMockMedicineInfo(medicineName: string): AIResponse {
+    // Provide more realistic mock data based on common medicines
+    const commonMedicines: { [key: string]: Partial<MedicineInfo> } = {
+      'paracetamol': {
+        uses: 'Used to treat mild to moderate pain and reduce fever. Effective for headaches, muscle aches, arthritis, backache, toothaches, colds, and fevers.',
+        sideEffects: 'Generally well-tolerated. Rare side effects may include skin rash, nausea, or allergic reactions. Overdose can cause serious liver damage.',
+        dosageInfo: 'Adults: 500-1000mg every 4-6 hours. Maximum 4000mg per day. Children: Dose based on weight. Always follow package instructions.',
+        interactions: 'May interact with warfarin, increasing bleeding risk. Avoid alcohol to prevent liver damage.',
+        warnings: 'Do not exceed recommended dose. Avoid if allergic to paracetamol. Consult doctor if symptoms persist beyond 3 days.'
+      },
+      'ibuprofen': {
+        uses: 'Anti-inflammatory drug used for pain relief, reducing inflammation, and lowering fever. Effective for headaches, dental pain, menstrual cramps, muscle aches, and arthritis.',
+        sideEffects: 'May cause stomach upset, heartburn, dizziness, or drowsiness. Long-term use may increase risk of heart problems or stomach bleeding.',
+        dosageInfo: 'Adults: 200-400mg every 4-6 hours. Maximum 1200mg per day without medical supervision. Take with food to reduce stomach irritation.',
+        interactions: 'May interact with blood thinners, ACE inhibitors, and diuretics. Can reduce effectiveness of blood pressure medications.',
+        warnings: 'Avoid if allergic to NSAIDs, have stomach ulcers, or severe heart/kidney disease. Not recommended during pregnancy.'
+      }
+    };
+    
+    const lowerName = medicineName.toLowerCase();
+    const mockData = commonMedicines[lowerName] || {};
+    
     return {
       success: true,
       data: {
         medicineName,
-        uses: `This is a demonstration of the AI medicine information feature for "${medicineName}". In a real implementation with valid API keys, this would show actual medical information from DeepSeek or Gemini AI services.`,
-        sideEffects: 'Common side effects may include nausea, headache, and dizziness. Always consult your healthcare provider for complete information.',
-        description: `${medicineName} is a medication used to treat various conditions. The exact description would be provided by the AI service based on the medicine name.`,
-        dosageInfo: 'Dosage varies based on individual factors. Always follow your healthcare provider\'s instructions.',
-        interactions: 'May interact with other medications. Consult your healthcare provider before taking with other medicines.',
-        warnings: 'Keep out of reach of children. Store in a cool, dry place. Consult your healthcare provider for specific warnings.',
+        description: mockData.uses || `${medicineName} is a medication. For accurate information about this specific medicine, please consult your healthcare provider or pharmacist.`,
+        uses: mockData.uses || 'Please consult your healthcare provider for specific information about uses and indications.',
+        sideEffects: mockData.sideEffects || 'Please consult your healthcare provider for information about potential side effects and adverse reactions.',
+        dosageInfo: mockData.dosageInfo || 'Dosage varies based on individual factors including age, weight, and medical condition. Always follow your healthcare provider\'s instructions.',
+        interactions: mockData.interactions || 'May interact with other medications, supplements, or medical conditions. Consult your healthcare provider before use.',
+        warnings: mockData.warnings || 'Keep out of reach of children. Store as directed. Do not exceed recommended dose. Consult your healthcare provider for specific warnings and precautions.',
       },
     };
   }
@@ -517,7 +648,7 @@ What specific information would you like about your medicines?`;
     try {
       console.log('Testing Gemini API key...');
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.geminiApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
         {
           contents: [
             {

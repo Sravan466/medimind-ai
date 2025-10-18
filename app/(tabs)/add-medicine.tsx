@@ -8,7 +8,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthContext } from '../../src/contexts/AuthContext';
 import { medicineService } from '../../src/services/supabase';
-import { notificationService } from '../../src/services/notifications';
+import { fixedNotificationService } from '../../src/services/notifications_fixed';
 import { Button } from '../../src/components/ui/Button';
 import { Input } from '../../src/components/ui/Input';
 import { VALIDATION_RULES, ERROR_MESSAGES, SUCCESS_MESSAGES, MEDICINE_FREQUENCIES, DAYS_OF_WEEK } from '../../src/utils/constants';
@@ -106,7 +106,7 @@ export default function AddMedicineScreen() {
            const medicine = data as any; // Type assertion for now
            // Add a small delay to prevent rapid successive calls
            await new Promise(resolve => setTimeout(resolve, 500));
-           await notificationService.scheduleMedicineReminder(medicine);
+           await fixedNotificationService.scheduleMedicineReminder(medicine);
            console.log(`Scheduled notifications for ${medicine.name}`);
          } catch (alarmError) {
            console.error('Error scheduling notifications:', alarmError);

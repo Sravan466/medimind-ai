@@ -2,7 +2,7 @@
 
 import { supabase } from './supabase';
 import { MedicineLog, Medicine } from '../types/database';
-import { notificationService } from './notifications';
+import { fixedNotificationService } from './notifications_fixed';
 
 export interface TodayMedicine {
   id: string;
@@ -121,9 +121,9 @@ export class MedicineLogService {
     try {
       console.log(`[MARK_AS_TAKEN] Marking log ${logId} as taken`);
       
-      // Cancel any funny reminders for this log
-      await notificationService.cancelFunnyChain(logId);
-      console.log(`[MARK_AS_TAKEN] Cancelled funny reminders for log ${logId}`);
+      // Cancel any follow-up reminders for this log
+      await fixedNotificationService.cancelFollowupReminders(logId);
+      console.log(`[MARK_AS_TAKEN] Cancelled follow-up reminders for log ${logId}`);
       
       const { error } = await supabase
         .from('medicine_logs')
@@ -150,9 +150,9 @@ export class MedicineLogService {
     try {
       console.log(`[MARK_AS_SKIPPED] Marking log ${logId} as skipped`);
       
-      // Cancel any funny reminders for this log
-      await notificationService.cancelFunnyChain(logId);
-      console.log(`[MARK_AS_SKIPPED] Cancelled funny reminders for log ${logId}`);
+      // Cancel any follow-up reminders for this log
+      await fixedNotificationService.cancelFollowupReminders(logId);
+      console.log(`[MARK_AS_SKIPPED] Cancelled follow-up reminders for log ${logId}`);
       
       const { error } = await supabase
         .from('medicine_logs')
@@ -190,10 +190,10 @@ export class MedicineLogService {
         return false;
       }
 
-      // Cancel all funny reminders for this log
-      await notificationService.cancelFunnyChain(logId);
+      // Cancel all follow-up reminders for this log
+      await fixedNotificationService.cancelFollowupReminders(logId);
 
-      console.log(`[MARK_AS_TAKEN] Successfully marked log ${logId} as taken and cancelled funny reminders`);
+      console.log(`[MARK_AS_TAKEN] Successfully marked log ${logId} as taken and cancelled follow-up reminders`);
       return true;
     } catch (error) {
       console.error('[MARK_AS_TAKEN] Error marking medicine as taken:', error);
@@ -216,10 +216,10 @@ export class MedicineLogService {
         return false;
       }
 
-      // Cancel all funny reminders for this log
-      await notificationService.cancelFunnyChain(logId);
+      // Cancel all follow-up reminders for this log
+      await fixedNotificationService.cancelFollowupReminders(logId);
 
-      console.log(`[MARK_AS_SKIPPED] Successfully marked log ${logId} as skipped and cancelled funny reminders`);
+      console.log(`[MARK_AS_SKIPPED] Successfully marked log ${logId} as skipped and cancelled follow-up reminders`);
       return true;
     } catch (error) {
       console.error('[MARK_AS_SKIPPED] Error marking medicine as skipped:', error);
@@ -275,8 +275,8 @@ export class MedicineLogService {
   async cancelFunnyReminders(logId: string): Promise<void> {
     try {
       console.log(`[CANCEL_FUNNY] Cancelling funny reminders for log ${logId}`);
-      // This will be handled by the notification service
-      await notificationService.cancelFunnyChain(logId);
+      // This will be handled by the fixed notification service
+      await fixedNotificationService.cancelFollowupReminders(logId);
     } catch (error) {
       console.error('[CANCEL_FUNNY] Error in cancelFunnyReminders:', error);
     }
