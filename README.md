@@ -102,7 +102,7 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 
 ### Get MediMind AI on Your Device
 
-[![Download APK](https://img.shields.io/badge/Download_APK-Android-green?style=for-the-badge&logo=android)](https://www.mediafire.com/file/sutieqbvsi6uvk0/application-dca04daa-a0a2-42b8-acc2-b39153284ca7.apk/file)
+[![Download APK](https://img.shields.io/badge/Download_APK-Android-green?style=for-the-badge&logo=android)](https://www.mediafire.com/file/tstwkt17v1vff1h/application-a4da66c2-8d9e-474f-af17-1c09e99651cc.apk/file)
 
 ### 📱 How to Install
 
@@ -114,7 +114,7 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 
 ### 🔗 Download Links
 
-- **[📱 APK Download](https://www.mediafire.com/file/sutieqbvsi6uvk0/application-dca04daa-a0a2-42b8-acc2-b39153284ca7.apk/file)** - Direct APK download for Android
+- **[📱 APK Download](https://www.mediafire.com/file/tstwkt17v1vff1h/application-a4da66c2-8d9e-474f-af17-1c09e99651cc.apk/file)** - Direct APK download for Android
 
 ### 📋 System Requirements
 
