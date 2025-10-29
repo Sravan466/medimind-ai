@@ -85,26 +85,27 @@ export class AIService {
     try {
       console.log(`[MEDICINE_INFO] Getting info for: ${medicineName}`);
       
-      // Try Gemini API
+      // Always try Gemini API first if key is available
       if (this.geminiApiKey && this.geminiApiKey.trim().length > 0) {
-        console.log('[MEDICINE_INFO] Trying Gemini API...');
-        try {
-          const response = await this.queryGemini(medicineName);
-          if (response.success && response.data) {
-            console.log('[MEDICINE_INFO] Gemini API successful');
-            return response;
-          }
-          console.log('[MEDICINE_INFO] Gemini API returned no data');
-        } catch (apiError) {
-          console.error('[MEDICINE_INFO] Gemini API error:', apiError);
+        console.log('[MEDICINE_INFO] Using Gemini API...');
+        const response = await this.queryGemini(medicineName);
+        if (response.success && response.data) {
+          console.log('[MEDICINE_INFO] Gemini API successful');
+          return response;
         }
+        console.log('[MEDICINE_INFO] Gemini API failed, error:', response.error);
+        // Return the error instead of falling back to mock data
+        return {
+          success: false,
+          error: response.error || 'Failed to get medicine information from Gemini API',
+        };
       } else {
         console.log('[MEDICINE_INFO] No Gemini API key available');
+        return {
+          success: false,
+          error: 'Gemini API key not configured. Please check your environment variables.',
+        };
       }
-
-      // Fallback to mock data
-      console.log('[MEDICINE_INFO] Using mock data');
-      return this.getMockMedicineInfo(medicineName);
     } catch (error) {
       console.error('[MEDICINE_INFO] Error getting medicine info:', error);
       return {
@@ -165,14 +166,26 @@ export class AIService {
       // Check rate limit before making request
       await this.checkRateLimit();
       
-      const prompt = this.buildMedicinePrompt(medicineName);
-      
       // Validate API key format
       if (!this.geminiApiKey || this.geminiApiKey.length < 30) {
         throw new Error('Invalid Gemini API key format');
       }
       
       console.log('[GEMINI] Making API request to Gemini...');
+      
+      const prompt = `Please provide detailed medical information about "${medicineName}" in the following JSON format:
+
+{
+  "medicineName": "${medicineName}",
+  "description": "Brief description of what this medicine is",
+  "uses": "What conditions this medicine treats",
+  "sideEffects": "Common and serious side effects",
+  "dosageInfo": "Typical dosing instructions",
+  "interactions": "Important drug interactions",
+  "warnings": "Critical warnings and precautions"
+}
+
+Provide accurate medical information. Always include a reminder to consult healthcare providers.`;
       
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
@@ -181,57 +194,61 @@ export class AIService {
             {
               parts: [
                 {
-                  text: `You are a medical information assistant. Provide accurate, helpful information about medicines in a structured format.\n\n${prompt}`
+                  text: prompt
                 }
               ]
             }
           ],
           generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1000,
+            temperature: 0.1,
+            maxOutputTokens: 2000,
           },
         },
         {
           headers: {
             'Content-Type': 'application/json',
           },
+          timeout: 30000,
         }
       );
 
-      const content = response.data.candidates[0]?.content?.parts[0]?.text;
+      const content = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!content) {
         throw new Error('No response content from Gemini');
       }
 
-      return this.parseAIResponse(content, medicineName);
+      console.log('[GEMINI] Raw response:', content.substring(0, 200));
+      return this.parseGeminiResponse(content, medicineName);
     } catch (error: any) {
       console.error('Gemini API error:', error);
       console.error('Error response:', error.response?.data);
       console.error('Error status:', error.response?.status);
       
-      // Handle rate limiting (429 error)
+      // Handle specific error cases
       if (error.response?.status === 429) {
         return {
           success: false,
-          error: 'Rate limit exceeded. Please wait a moment and try again. You can also try using a different AI service.',
+          error: 'Rate limit exceeded. Please wait a moment and try again.',
         };
       }
       
-      if (error.response?.status === 404) {
-        return {
-          success: false,
-          error: 'Gemini API: Model not found. Please check your API key and model access.',
-        };
-      }
       if (error.response?.status === 400) {
         return {
           success: false,
-          error: 'Gemini API: Bad request. Please check your API key format.',
+          error: 'Invalid API request. Please check your Gemini API key.',
         };
       }
+      
+      if (error.response?.status === 403) {
+        return {
+          success: false,
+          error: 'API access forbidden. Please check your Gemini API key permissions.',
+        };
+      }
+      
       return {
         success: false,
-        error: 'Gemini API error: ' + (error.response?.data?.error?.message || error.message),
+        error: `Gemini API error: ${error.response?.data?.error?.message || error.message}`,
       };
     }
   }
@@ -460,62 +477,105 @@ What specific information would you like about your medicines?`;
          return "I'm Cura, your AI health companion! I can see your current medicines and provide personalized advice. What would you like to know?";
   }
 
-  private parseAIResponse(content: string, medicineName: string): AIResponse {
+  private parseGeminiResponse(content: string, medicineName: string): AIResponse {
     try {
-      console.log('[AI_PARSE] Raw content:', content.substring(0, 200) + '...');
+      console.log('[GEMINI_PARSE] Raw content:', content.substring(0, 200));
+      
+      // Clean the content - remove markdown code blocks and extra formatting
+      let cleanContent = content.replace(/```json\n?|```\n?/g, '').trim();
       
       // Try to extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      let jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+      
+      // If greedy match fails, try finding JSON boundaries manually
+      if (!jsonMatch) {
+        const startIndex = cleanContent.indexOf('{');
+        const endIndex = cleanContent.lastIndexOf('}');
+        if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+          const jsonStr = cleanContent.substring(startIndex, endIndex + 1);
+          jsonMatch = [jsonStr];
+        }
+      }
+      
       if (jsonMatch) {
         try {
           const parsed = JSON.parse(jsonMatch[0]);
-          console.log('[AI_PARSE] Successfully parsed JSON');
-          return {
-            success: true,
-            data: {
-              medicineName: parsed.medicineName || medicineName,
-              uses: parsed.uses || 'Information not available. Please consult your healthcare provider.',
-              sideEffects: parsed.sideEffects || 'Information not available. Please consult your healthcare provider.',
-              description: parsed.description || 'Information not available. Please consult your healthcare provider.',
-              dosageInfo: parsed.dosageInfo || 'Information not available. Please consult your healthcare provider.',
-              interactions: parsed.interactions || 'Information not available. Please consult your healthcare provider.',
-              warnings: parsed.warnings || 'Information not available. Please consult your healthcare provider.',
-            },
-          };
+          console.log('[GEMINI_PARSE] Successfully parsed JSON');
+          
+          // Validate that we have meaningful content
+          if (parsed.description && parsed.uses && parsed.sideEffects) {
+            return {
+              success: true,
+              data: {
+                medicineName: parsed.medicineName || medicineName,
+                description: parsed.description,
+                uses: parsed.uses,
+                sideEffects: parsed.sideEffects,
+                dosageInfo: parsed.dosageInfo || 'Please consult your healthcare provider for dosage information.',
+                interactions: parsed.interactions || 'Please consult your healthcare provider for interaction information.',
+                warnings: parsed.warnings || 'Please consult your healthcare provider for warnings and precautions.',
+              },
+            };
+          }
         } catch (jsonError) {
-          console.log('[AI_PARSE] JSON parsing failed, using text parsing');
+          console.log('[GEMINI_PARSE] JSON parsing failed:', jsonError);
         }
       }
 
       // If JSON parsing fails, try to extract structured information from text
       const structuredData = this.parseTextResponse(content, medicineName);
       if (structuredData) {
+        console.log('[GEMINI_PARSE] Successfully parsed text response');
         return { success: true, data: structuredData };
       }
 
-      // Final fallback
-      console.log('[AI_PARSE] Using fallback mock data');
-      return this.getMockMedicineInfo(medicineName);
+      // If all parsing fails, return error instead of mock data
+      console.log('[GEMINI_PARSE] Failed to parse response');
+      return {
+        success: false,
+        error: 'Unable to parse medicine information from API response. Please try again.',
+      };
     } catch (error) {
-      console.error('[AI_PARSE] Error parsing AI response:', error);
-      return this.getMockMedicineInfo(medicineName);
+      console.error('[GEMINI_PARSE] Error parsing response:', error);
+      return {
+        success: false,
+        error: 'Error processing medicine information. Please try again.',
+      };
     }
   }
   
   private parseTextResponse(content: string, medicineName: string): MedicineInfo | null {
     try {
-      console.log('[AI_PARSE] Parsing text response for:', medicineName);
+      console.log('[TEXT_PARSE] Parsing text response for:', medicineName);
       
-      // Remove any JSON markers or code blocks
+      // Remove any JSON markers, code blocks, and formatting
       const cleanContent = content.replace(/```json|```|\*\*|\*/g, '').trim();
       
-      // If content looks like raw JSON string, don't show it
-      if (cleanContent.startsWith('{') && cleanContent.includes('"medicineName"')) {
-        console.log('[AI_PARSE] Detected raw JSON, rejecting');
-        return null;
+      // If content looks like malformed JSON, try to extract meaningful text
+      if (cleanContent.includes('medicineName') || cleanContent.includes('description')) {
+        // Try to extract information from a more natural text format
+        const description = this.extractFromText(cleanContent, ['description', 'about', 'what is']);
+        const uses = this.extractFromText(cleanContent, ['uses', 'used for', 'treats', 'treatment']);
+        const sideEffects = this.extractFromText(cleanContent, ['side effects', 'adverse effects', 'reactions']);
+        const dosageInfo = this.extractFromText(cleanContent, ['dosage', 'dose', 'how to take']);
+        const interactions = this.extractFromText(cleanContent, ['interactions', 'drug interactions']);
+        const warnings = this.extractFromText(cleanContent, ['warnings', 'precautions', 'contraindications']);
+        
+        if (description || uses) {
+          console.log('[TEXT_PARSE] Successfully extracted from natural text');
+          return {
+            medicineName,
+            description: description || `${medicineName} is a medication. Please consult your healthcare provider for detailed information.`,
+            uses: uses || 'Please consult your healthcare provider for information about uses.',
+            sideEffects: sideEffects || 'Please consult your healthcare provider for information about side effects.',
+            dosageInfo: dosageInfo || 'Please consult your healthcare provider for dosage information.',
+            interactions: interactions || 'Please consult your healthcare provider for interaction information.',
+            warnings: warnings || 'Please consult your healthcare provider for warnings and precautions.',
+          };
+        }
       }
       
-      // Extract sections using the new structured format
+      // Try structured section extraction
       const sections = {
         description: this.extractStructuredSection(cleanContent, 'DESCRIPTION'),
         uses: this.extractStructuredSection(cleanContent, 'USES'),
@@ -525,9 +585,8 @@ What specific information would you like about your medicines?`;
         warnings: this.extractStructuredSection(cleanContent, 'WARNINGS')
       };
       
-      // If we got good structured data, use it
       if (sections.description || sections.uses) {
-        console.log('[AI_PARSE] Successfully extracted structured sections');
+        console.log('[TEXT_PARSE] Successfully extracted structured sections');
         return {
           medicineName,
           description: sections.description || `Information about ${medicineName}. Please consult your healthcare provider for detailed information.`,
@@ -539,10 +598,10 @@ What specific information would you like about your medicines?`;
         };
       }
       
-      console.log('[AI_PARSE] No structured sections found');
+      console.log('[TEXT_PARSE] No structured content found');
       return null;
     } catch (error) {
-      console.error('[AI_PARSE] Error parsing text response:', error);
+      console.error('[TEXT_PARSE] Error parsing text response:', error);
       return null;
     }
   }
@@ -566,12 +625,18 @@ What specific information would you like about your medicines?`;
     }
   }
   
-  private extractSection(content: string, keywords: string[]): string | null {
+  private extractFromText(content: string, keywords: string[]): string | null {
     for (const keyword of keywords) {
-      const regex = new RegExp(`${keyword}[:\s]*([^\n]{50,200})`, 'i');
+      // Look for keyword followed by colon and content
+      const regex = new RegExp(`${keyword}[:\s]*([^\n]{20,300})`, 'i');
       const match = content.match(regex);
       if (match && match[1]) {
-        return match[1].trim();
+        let extracted = match[1].trim();
+        // Clean up common artifacts
+        extracted = extracted.replace(/["\{\}]/g, '').trim();
+        if (extracted.length > 20) {
+          return extracted;
+        }
       }
     }
     return null;
@@ -654,13 +719,13 @@ What specific information would you like about your medicines?`;
             {
               parts: [
                 {
-                  text: 'Hello, this is a test message.'
+                  text: 'Hello, this is a test message. Please respond with "API test successful".'
                 }
               ]
             }
           ],
           generationConfig: {
-            temperature: 0.3,
+            temperature: 0.1,
             maxOutputTokens: 50,
           },
         },
@@ -668,11 +733,18 @@ What specific information would you like about your medicines?`;
           headers: {
             'Content-Type': 'application/json',
           },
+          timeout: 10000,
         }
       );
 
-      console.log('Gemini API test successful!');
-      return true;
+      const content = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (content) {
+        console.log('Gemini API test successful! Response:', content.substring(0, 50));
+        return true;
+      } else {
+        console.log('Gemini API test failed: No content in response');
+        return false;
+      }
     } catch (error: any) {
       console.error('Gemini API test failed:', error.response?.status, error.response?.data);
       return false;

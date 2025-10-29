@@ -115,11 +115,32 @@ export default function InfoScreen() {
   };
 
   const formatInfo = (info: string) => {
-    return info.split('\n').map((line, index) => (
-      <Text key={index} style={styles.infoText}>
-        {line}
-      </Text>
-    ));
+    if (!info) return <Text style={styles.sectionText}>Information not available</Text>;
+    
+    // Clean up the text and format it properly
+    const cleanText = info
+      .replace(/\*\*/g, '') // Remove markdown bold
+      .replace(/\*/g, '') // Remove markdown italic
+      .replace(/\n\s*\n/g, '\n') // Remove extra line breaks
+      .trim();
+    
+    // Split by sentences or bullet points for better readability
+    const sentences = cleanText.split(/(?<=\.)\s+|\n|•\s*/).filter(s => s.trim());
+    
+    return (
+      <View>
+        {sentences.map((sentence, index) => {
+          const trimmed = sentence.trim();
+          if (!trimmed) return null;
+          
+          return (
+            <Text key={index} style={styles.sectionText}>
+              {trimmed.endsWith('.') ? trimmed : trimmed + (index < sentences.length - 1 ? '.' : '')}
+            </Text>
+          );
+        })}
+      </View>
+    );
   };
 
   return (
@@ -305,7 +326,7 @@ export default function InfoScreen() {
                     />
                     <Text style={styles.sectionTitle}>Description</Text>
                   </View>
-                  <Text style={styles.sectionText}>{medicineInfo.description}</Text>
+                  {formatInfo(medicineInfo.description)}
                 </View>
 
                 <View style={styles.infoSection}>
@@ -317,7 +338,7 @@ export default function InfoScreen() {
                     />
                     <Text style={styles.sectionTitle}>Uses</Text>
                   </View>
-                  <Text style={styles.sectionText}>{medicineInfo.uses}</Text>
+                  {formatInfo(medicineInfo.uses)}
                 </View>
 
                 <View style={styles.infoSection}>
@@ -329,7 +350,7 @@ export default function InfoScreen() {
                     />
                     <Text style={styles.sectionTitle}>Side Effects</Text>
                   </View>
-                  <Text style={styles.sectionText}>{medicineInfo.sideEffects}</Text>
+                  {formatInfo(medicineInfo.sideEffects)}
                 </View>
 
                 <View style={styles.infoSection}>
@@ -341,7 +362,7 @@ export default function InfoScreen() {
                     />
                     <Text style={styles.sectionTitle}>Dosage Information</Text>
                   </View>
-                  <Text style={styles.sectionText}>{medicineInfo.dosageInfo}</Text>
+                  {formatInfo(medicineInfo.dosageInfo)}
                 </View>
 
                 <View style={styles.infoSection}>
@@ -353,7 +374,7 @@ export default function InfoScreen() {
                     />
                     <Text style={styles.sectionTitle}>Drug Interactions</Text>
                   </View>
-                  <Text style={styles.sectionText}>{medicineInfo.interactions}</Text>
+                  {formatInfo(medicineInfo.interactions)}
                 </View>
 
                 <View style={styles.infoSection}>
@@ -365,7 +386,7 @@ export default function InfoScreen() {
                     />
                     <Text style={styles.sectionTitle}>Warnings</Text>
                   </View>
-                  <Text style={styles.sectionText}>{medicineInfo.warnings}</Text>
+                  {formatInfo(medicineInfo.warnings)}
                 </View>
 
                 <View style={styles.disclaimer}>
@@ -631,6 +652,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.neutral[700],
     lineHeight: 24,
+    marginBottom: 8,
+    textAlign: 'justify',
   },
   disclaimer: {
     marginTop: 24,
