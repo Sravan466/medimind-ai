@@ -78,19 +78,19 @@ MediMind AI is a comprehensive mobile application designed to help users manage 
 <div align="center">
 
 ### Home Dashboard
-<img src="./screenshots/dashboard.jpg" alt="Home Dashboard" width="200" height="400">
+<img src="./screenshots_fixed/dashboard_new.jpg" alt="Home Dashboard" width="200" height="400">
 
 ### Medicine Management
-<img src="./screenshots/medicines.jpg" alt="Medicine Management" width="200" height="400">
+<img src="./screenshots_fixed/medicines.jpg" alt="Medicine Management" width="200" height="400">
 
 ### AI Chatbot
-<img src="./screenshots/chat.jpg" alt="AI Chatbot" width="200" height="400">
+<img src="./screenshots_fixed/chat.jpg" alt="AI Chatbot" width="200" height="400">
 
 ### Medicine Information
-<img src="./screenshots/info.jpg" alt="Medicine Information" width="200" height="400">
+<img src="./screenshots_fixed/info.jpg" alt="Medicine Information" width="200" height="400">
 
 ### Profile & Settings
-<img src="./screenshots/profile.jpg" alt="Profile Settings" width="200" height="400">
+<img src="./screenshots_fixed/profile.jpg" alt="Profile Settings" width="200" height="400">
 
 </div>
 
