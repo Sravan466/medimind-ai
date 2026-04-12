@@ -277,15 +277,31 @@ export const borderRadius = {
   lg: 16,
   xl: 24,
   round: 50,
+  chip: 8,
 } as const;
+
+// Motion tokens — durations in ms. Respect prefers-reduced-motion at call sites.
+export const motion = {
+  fast: 120,
+  base: 200,
+  slow: 320,
+} as const;
+
+// Semantic chip color meaning — keep usage consistent across the app:
+// info    → primary[*]   (neutral state, default filter selection)
+// warning → warning[*]   (caution, e.g. emergency contact note)
+// danger  → error[*]     (destructive)
+// success → success[*]   (only for "dose taken")
+// Avoid using `secondary` (purple) — retired from the brand palette.
 
 // Standardized typography hierarchy for screens
 export const screenTypography = {
   screenTitle:    { fontSize: 24, fontWeight: '700' as const },
-  screenSubtitle: { fontSize: 14, fontWeight: '400' as const },
+  screenSubtitle: { fontSize: 16, fontWeight: '400' as const },
   sectionTitle:   { fontSize: 18, fontWeight: '600' as const },
   cardTitle:      { fontSize: 16, fontWeight: '700' as const },
-  body:           { fontSize: 14, fontWeight: '400' as const },
+  body:           { fontSize: 16, fontWeight: '400' as const },
+  bodyDense:      { fontSize: 14, fontWeight: '400' as const },
   caption:        { fontSize: 12, fontWeight: '400' as const },
 } as const;
 
