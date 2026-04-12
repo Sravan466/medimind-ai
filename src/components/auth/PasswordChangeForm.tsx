@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import { TextInput, Button, Text, Card } from 'react-native-paper';
+import { TextInput, Text, Card } from 'react-native-paper';
+import { Button } from '../ui/Button';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAppTheme } from '../../styles/theme';
 import { useSettingsContext } from '../../contexts/SettingsContext';
@@ -131,6 +132,7 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
                   />
                 )}
                 onPress={() => setShowCurrentPassword(!showCurrentPassword)}
+                accessibilityLabel={showCurrentPassword ? 'Hide current password' : 'Show current password'}
               />
             }
             style={styles.input}
@@ -153,6 +155,7 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
                   />
                 )}
                 onPress={() => setShowNewPassword(!showNewPassword)}
+                accessibilityLabel={showNewPassword ? 'Hide new password' : 'Show new password'}
               />
             }
             style={styles.input}
@@ -175,6 +178,7 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
                   />
                 )}
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
               />
             }
             style={styles.input}
@@ -183,16 +187,16 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
 
           <View style={styles.buttonContainer}>
             <Button
-              mode="outlined"
+              variant="secondary"
               onPress={handleCancel}
               style={styles.button}
               disabled={loading}
             >
               Cancel
             </Button>
-            
+
             <Button
-              mode="contained"
+              variant="primary"
               onPress={handlePasswordChange}
               style={styles.button}
               loading={loading}

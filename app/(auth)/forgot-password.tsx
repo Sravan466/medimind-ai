@@ -129,14 +129,14 @@ export default function ForgotPasswordScreen() {
               disabled={loading}
             />
             {emailError ? (
-              <HelperText type="error" visible={!!emailError}>
+              <HelperText type="error" visible={!!emailError} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {emailError}
               </HelperText>
             ) : null}
 
             {/* Error Message */}
             {error ? (
-              <HelperText type="error" visible={!!error}>
+              <HelperText type="error" visible={!!error} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {error}
               </HelperText>
             ) : null}
@@ -163,6 +163,7 @@ export default function ForgotPasswordScreen() {
               disabled={loading}
               style={styles.backToLoginButton}
               labelStyle={styles.backButtonText}
+              accessibilityHint="Navigate back to sign in"
             >
               Back to Login
             </Button>
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   surface: {
     borderRadius: 16,
     padding: 24,
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral[50],
   },
   input: {
     marginBottom: 16,
@@ -233,8 +234,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   footer: {
-    borderTopWidth: 2,
-    borderTopColor: colors.neutral[900],
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral[200],
     paddingTop: 24,
   },
   backButton: {

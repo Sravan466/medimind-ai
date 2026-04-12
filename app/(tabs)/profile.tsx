@@ -140,12 +140,17 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
       {/* Modern Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+      <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.headerLeft}>
-            <Text style={[styles.headerTitle, { color: theme.colors.onSurface }]}>Profile & Settings</Text>
-            <Text style={[styles.headerSubtitle, { color: theme.colors.onSurfaceVariant }]}>
+            <Text style={styles.headerTitle}>Profile & Settings</Text>
+            <Text style={styles.headerSubtitle}>
               Manage your account and preferences
             </Text>
           </View>
@@ -159,6 +164,7 @@ export default function ProfileScreen() {
                   disabled={loading}
                   iconColor={colors.success[500]}
                   style={styles.actionButton}
+                  accessibilityLabel="Save profile changes"
                 />
                 <IconButton
                   icon="close"
@@ -167,6 +173,7 @@ export default function ProfileScreen() {
                   disabled={loading}
                   iconColor={colors.error[500]}
                   style={styles.actionButton}
+                  accessibilityLabel="Cancel editing"
                 />
               </View>
             ) : (
@@ -174,19 +181,14 @@ export default function ProfileScreen() {
                 icon="pencil"
                 size={24}
                 onPress={() => setEditing(true)}
-                iconColor={theme.colors.primary}
+                iconColor={colors.primary[500]}
                 style={styles.actionButton}
+                accessibilityLabel="Edit profile"
               />
             )}
           </View>
         </View>
       </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
         {/* Profile Section */}
         <Card style={[styles.profileCard, { backgroundColor: theme.colors.surface }]}>
           <Card.Content style={styles.profileContent}>
@@ -315,6 +317,8 @@ export default function ProfileScreen() {
                 value={settings?.notifications?.sound_enabled || false}
                 onValueChange={(value) => updateNotificationSetting('sound_enabled', value)}
                 color={theme.colors.primary}
+                accessibilityLabel="Medicine Reminders"
+                accessibilityRole="switch"
               />
             </View>
             
@@ -331,6 +335,8 @@ export default function ProfileScreen() {
                 value={settings?.notifications?.vibration_enabled || false}
                 onValueChange={(value) => updateNotificationSetting('vibration_enabled', value)}
                 color={theme.colors.primary}
+                accessibilityLabel="Vibration"
+                accessibilityRole="switch"
               />
             </View>
           </Card.Content>
@@ -361,6 +367,8 @@ export default function ProfileScreen() {
                 value={settings?.notifications?.categories?.health_tips || false}
                 onValueChange={handleToggleHealthTips}
                 color={theme.colors.primary}
+                accessibilityLabel="Daily Health Tips"
+                accessibilityRole="switch"
               />
             </View>
             
@@ -405,7 +413,7 @@ export default function ProfileScreen() {
                 variant="outline"
                 onPress={() => setShowPasswordForm(true)}
                 style={styles.profileActionButton}
-                icon="🔒"
+                icon="lock-outline"
               >
                 Change Password
               </Button>
@@ -414,7 +422,7 @@ export default function ProfileScreen() {
                 variant="outline"
                 onPress={handleResetSettings}
                 style={styles.profileActionButton}
-                icon="🔄"
+                icon="refresh"
               >
                 Reset Settings
               </Button>
@@ -423,16 +431,16 @@ export default function ProfileScreen() {
                 variant="outline"
                 onPress={handleSignOut}
                 style={styles.profileActionButton}
-                icon="🚪"
+                icon="logout"
               >
                 Sign Out
               </Button>
               
               <Button
-                variant="outline"
+                variant="danger"
                 onPress={() => setShowDeleteForm(true)}
-                style={styles.deleteActionButton}
-                icon="🗑️"
+                style={styles.profileActionButton}
+                icon="delete-outline"
               >
                 Delete Account
               </Button>
@@ -476,16 +484,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   header: {
-    paddingTop: 60, // Safe area for status bar
-    paddingBottom: 20,
+    backgroundColor: colors.neutral[50],
+    paddingTop: 20,
+    paddingBottom: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: colors.neutral[200],
-    elevation: 2,
-    shadowColor: colors.neutral[900],
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   headerContent: {
     flexDirection: 'row',
@@ -496,14 +500,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.neutral[900],
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: colors.neutral[600],
+    fontSize: 14,
+    color: colors.neutral[500],
   },
   headerRight: {
     flexDirection: 'row',
@@ -527,15 +531,15 @@ const styles = StyleSheet.create({
   },
   profileCard: {
     marginBottom: 24,
-    borderRadius: 20,
-    elevation: 4,
+    borderRadius: 16,
+    elevation: 2,
     shadowColor: colors.neutral[900],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
   },
   profileContent: {
-    padding: 24,
+    padding: 20,
   },
   profileHeader: {
     flexDirection: 'row',
@@ -543,7 +547,7 @@ const styles = StyleSheet.create({
   },
   profileAvatar: {
     marginRight: 20,
-    elevation: 4,
+    elevation: 2,
     shadowColor: colors.primary[500],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -557,8 +561,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileName: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
     color: colors.neutral[900],
     marginBottom: 6,
   },
@@ -597,8 +601,8 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: colors.neutral[900],
   },
   formFields: {
@@ -637,8 +641,5 @@ const styles = StyleSheet.create({
   deleteButton: {
     borderColor: colors.error[300],
   },
-  deleteActionButton: {
-    justifyContent: 'flex-start',
-    borderColor: colors.error[300],
-  },
+  deleteActionButton: {},
 });

@@ -131,7 +131,7 @@ export default function RegisterScreen() {
               disabled={loading}
             />
             {formErrors.fullName ? (
-              <HelperText type="error" visible={!!formErrors.fullName}>
+              <HelperText type="error" visible={!!formErrors.fullName} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {formErrors.fullName}
               </HelperText>
             ) : null}
@@ -150,7 +150,7 @@ export default function RegisterScreen() {
               disabled={loading}
             />
             {formErrors.email ? (
-              <HelperText type="error" visible={!!formErrors.email}>
+              <HelperText type="error" visible={!!formErrors.email} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {formErrors.email}
               </HelperText>
             ) : null}
@@ -172,6 +172,7 @@ export default function RegisterScreen() {
                     />
                   )}
                   onPress={() => setShowPassword(!showPassword)}
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
                 />
               }
               style={styles.input}
@@ -179,7 +180,7 @@ export default function RegisterScreen() {
               disabled={loading}
             />
             {formErrors.password ? (
-              <HelperText type="error" visible={!!formErrors.password}>
+              <HelperText type="error" visible={!!formErrors.password} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {formErrors.password}
               </HelperText>
             ) : null}
@@ -201,6 +202,7 @@ export default function RegisterScreen() {
                     />
                   )}
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                 />
               }
               style={styles.input}
@@ -208,14 +210,14 @@ export default function RegisterScreen() {
               disabled={loading}
             />
             {formErrors.confirmPassword ? (
-              <HelperText type="error" visible={!!formErrors.confirmPassword}>
+              <HelperText type="error" visible={!!formErrors.confirmPassword} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {formErrors.confirmPassword}
               </HelperText>
             ) : null}
 
             {/* Error Message */}
             {error ? (
-              <HelperText type="error" visible={!!error}>
+              <HelperText type="error" visible={!!error} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {error}
               </HelperText>
             ) : null}
@@ -244,6 +246,7 @@ export default function RegisterScreen() {
               onPress={handleSignIn}
               disabled={loading}
               style={styles.signInButton}
+              accessibilityHint="Navigate to sign in"
             >
               Sign In
             </Button>
@@ -267,7 +270,7 @@ const styles = StyleSheet.create({
   surface: {
     borderRadius: 16,
     padding: 24,
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral[50],
   },
   input: {
     marginBottom: 16,
@@ -299,8 +302,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopWidth: 2,
-    borderTopColor: colors.neutral[900],
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral[200],
     paddingTop: 24,
   },
   footerText: {

@@ -115,7 +115,7 @@ export default function LoginScreen() {
               disabled={loading}
             />
             {formErrors.email ? (
-              <HelperText type="error" visible={!!formErrors.email}>
+              <HelperText type="error" visible={!!formErrors.email} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {formErrors.email}
               </HelperText>
             ) : null}
@@ -137,6 +137,7 @@ export default function LoginScreen() {
                     />
                   )}
                   onPress={() => setShowPassword(!showPassword)}
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
                 />
               }
               style={styles.input}
@@ -144,14 +145,14 @@ export default function LoginScreen() {
               disabled={loading}
             />
             {formErrors.password ? (
-              <HelperText type="error" visible={!!formErrors.password}>
+              <HelperText type="error" visible={!!formErrors.password} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {formErrors.password}
               </HelperText>
             ) : null}
 
             {/* Error Message */}
             {error ? (
-              <HelperText type="error" visible={!!error}>
+              <HelperText type="error" visible={!!error} accessibilityRole="alert" accessibilityLiveRegion="assertive">
                 {error}
               </HelperText>
             ) : null}
@@ -174,6 +175,7 @@ export default function LoginScreen() {
               onPress={handleForgotPassword}
               disabled={loading}
               style={styles.forgotPasswordButton}
+              accessibilityHint="Navigate to password reset"
             >
               Forgot Password?
             </Button>
@@ -189,6 +191,7 @@ export default function LoginScreen() {
               onPress={handleSignUp}
               disabled={loading}
               style={styles.signUpButton}
+              accessibilityHint="Navigate to account registration"
             >
               Sign Up
             </Button>
@@ -212,7 +215,7 @@ const styles = StyleSheet.create({
   surface: {
     borderRadius: 16,
     padding: 24,
-    backgroundColor: 'white',
+    backgroundColor: colors.neutral[50],
   },
   input: {
     marginBottom: 16,
@@ -244,8 +247,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopWidth: 2,
-    borderTopColor: colors.neutral[900],
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral[200],
     paddingTop: 24,
   },
   footerText: {

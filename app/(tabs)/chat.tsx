@@ -220,6 +220,7 @@ export default function ChatScreen() {
               size={24}
               onPress={handleClearChat}
               iconColor={colors.neutral[600]}
+              accessibilityLabel="Clear chat history"
             />
           </View>
         </View>
@@ -242,6 +243,7 @@ export default function ChatScreen() {
               size={16}
               onPress={() => setShowMedicineBanner(false)}
               iconColor={colors.neutral[500]}
+              accessibilityLabel="Dismiss medicine context"
             />
           </Card.Content>
         </Card>
@@ -257,6 +259,8 @@ export default function ChatScreen() {
           style={styles.messagesContainer}
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}
+          accessibilityLiveRegion="polite"
+          accessibilityLabel="Chat messages"
         >
           {messages.map((message) => (
             <View
@@ -315,6 +319,7 @@ export default function ChatScreen() {
                 size={16}
                 onPress={clearError}
                 iconColor={colors.error[500]}
+                accessibilityLabel="Dismiss error"
               />
             </View>
           )}
@@ -336,6 +341,8 @@ export default function ChatScreen() {
                   style={styles.suggestionChip}
                   textStyle={styles.suggestionText}
                   selectedColor={colors.primary[600]}
+                  accessibilityRole="button"
+                  accessibilityLabel={suggestion}
                 >
                   {suggestion}
                 </Chip>
@@ -362,6 +369,7 @@ export default function ChatScreen() {
                   icon={isLoading ? "loading" : "send"}
                   onPress={handleSend}
                   disabled={!inputText.trim() || isLoading}
+                  accessibilityLabel="Send message"
                 />
               }
             />
@@ -379,11 +387,11 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.neutral[50],
-    paddingTop: 50, // Safe area for status bar
-    paddingBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.neutral[900],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral[100],
   },
   headerContent: {
     flexDirection: 'row',
@@ -398,23 +406,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     marginRight: 12,
   },
   headerText: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.neutral[900],
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: colors.neutral[600],
+    color: colors.neutral[500],
   },
   headerRight: {
     flexDirection: 'row',
@@ -424,7 +432,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 16,
     backgroundColor: colors.primary[50],
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.primary[100],
   },
@@ -493,7 +501,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   userMessageText: {
-    color: '#FFFFFF',
+    color: colors.neutral[50],
     fontSize: 16,
     lineHeight: 20,
   },
@@ -584,7 +592,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.error[50],
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 16,
   },
   errorText: {
