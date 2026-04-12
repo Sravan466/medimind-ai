@@ -141,6 +141,13 @@ export default function MedicinesScreen() {
 
   return (
     <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
       {/* Custom Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -157,22 +164,15 @@ export default function MedicinesScreen() {
               onPress={handleAddMedicine}
               iconColor={colors.primary[500]}
               style={styles.headerAddButton}
+              accessibilityLabel="Add new medicine"
             />
           </View>
         </View>
       </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
         {medicines.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconContainer}>
-              <Text style={styles.emptyIcon}>💊</Text>
+              <MaterialCommunityIcons name="pill" size={48} color={colors.neutral[400]} />
             </View>
             <Text style={styles.emptyTitle}>No Medicines Added Yet</Text>
             <Text style={styles.emptySubtitle}>
@@ -180,9 +180,8 @@ export default function MedicinesScreen() {
             </Text>
             <Button
               variant="primary"
+              size="lg"
               onPress={handleAddMedicine}
-              style={styles.addButton}
-              labelStyle={styles.addButtonText}
               icon="plus"
             >
               Add Your First Medicine
@@ -191,7 +190,7 @@ export default function MedicinesScreen() {
         ) : (
           <View style={styles.medicinesList}>
             {medicines.map((medicine) => (
-              <Card key={medicine.id} style={styles.medicineCard}>
+              <Card key={medicine.id} style={styles.medicineCard} accessibilityLabel={`${medicine.name}, ${medicine.dosage}, ${medicine.is_active ? 'Active' : 'Inactive'}`}>
                 <Card.Content style={styles.medicineContent}>
                   <View style={styles.medicineHeader}>
                     <View style={styles.medicineInfo}>
@@ -216,6 +215,7 @@ export default function MedicinesScreen() {
                             size={20}
                             onPress={() => setMenuVisible(medicine.id)}
                             iconColor={colors.neutral[600]}
+                            accessibilityLabel="Medicine options"
                           />
                         }
                       >
@@ -279,7 +279,8 @@ export default function MedicinesScreen() {
           style={styles.fab}
           onPress={handleAddMedicine}
           label="Add Medicine"
-          color="#FFFFFF"
+          color={colors.neutral[50]}
+          accessibilityLabel="Add Medicine"
         />
       )}
     </View>
@@ -299,11 +300,11 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.neutral[50],
-    paddingTop: 50, // Safe area for status bar
+    paddingTop: 20,
     paddingBottom: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.neutral[900],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral[200],
   },
   headerContent: {
     flexDirection: 'row',
@@ -314,14 +315,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.neutral[900],
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: colors.neutral[600],
+    color: colors.neutral[500],
   },
   headerRight: {
     flexDirection: 'row',
@@ -330,23 +331,8 @@ const styles = StyleSheet.create({
   headerAddButton: {
     margin: 0,
   },
-  addButton: {
-    backgroundColor: colors.primary[500],
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    elevation: 4,
-    shadowColor: colors.primary[500],
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  addButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
-  },
+  addButton: {},
+  addButtonText: {},
   scrollView: {
     flex: 1,
   },
@@ -366,9 +352,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 16,
   },
-  emptyIcon: {
-    fontSize: 48,
-  },
+  emptyIcon: {},
   emptyTitle: {
     fontSize: 22,
     fontWeight: 'bold',
@@ -388,10 +372,10 @@ const styles = StyleSheet.create({
   },
   medicineCard: {
     marginBottom: 12,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   medicineContent: {
-    padding: 16,
+    padding: 20,
   },
   medicineHeader: {
     flexDirection: 'row',

@@ -279,6 +279,16 @@ export const borderRadius = {
   round: 50,
 } as const;
 
+// Standardized typography hierarchy for screens
+export const screenTypography = {
+  screenTitle:    { fontSize: 24, fontWeight: '700' as const },
+  screenSubtitle: { fontSize: 14, fontWeight: '400' as const },
+  sectionTitle:   { fontSize: 18, fontWeight: '600' as const },
+  cardTitle:      { fontSize: 16, fontWeight: '700' as const },
+  body:           { fontSize: 14, fontWeight: '400' as const },
+  caption:        { fontSize: 12, fontWeight: '400' as const },
+} as const;
+
 // Shadows - Updated for better dark mode support
 export const shadows = {
   small: {

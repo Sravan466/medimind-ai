@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, ScrollView } from 'react-native';
-import { 
-  TextInput, 
-  Button, 
-  Text, 
-  Card, 
-  Checkbox, 
-  List, 
+import {
+  TextInput,
+  Text,
+  Card,
+  Checkbox,
+  List,
   Divider,
   ProgressBar,
   Chip 
 } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Button } from '../ui/Button';
 import { useAppTheme } from '../../styles/theme';
 import { useSettingsContext } from '../../contexts/SettingsContext';
 import { useAuthContext } from '../../contexts/AuthContext';
@@ -251,18 +251,17 @@ export const AccountDeletionForm: React.FC<AccountDeletionFormProps> = ({
 
             <View style={styles.buttonContainer}>
               <Button
-                mode="outlined"
+                variant="secondary"
                 onPress={handleCancel}
                 style={styles.button}
               >
                 Cancel
               </Button>
-              
+
               <Button
-                mode="contained"
+                variant="danger"
                 onPress={() => setStep('confirm')}
                 style={styles.button}
-                buttonColor={theme.colors.error}
               >
                 Continue
               </Button>
@@ -286,13 +285,13 @@ export const AccountDeletionForm: React.FC<AccountDeletionFormProps> = ({
           </Text>
 
           <View style={styles.form}>
-            <View style={styles.checkboxContainer}>
+            <View style={styles.checkboxContainer} accessible={true} accessibilityRole="checkbox" accessibilityState={{ checked: exportData }} accessibilityLabel="Export my data before deletion">
               <Checkbox
                 status={exportData ? 'checked' : 'unchecked'}
                 onPress={() => setExportData(!exportData)}
               />
-              <Text 
-                variant="bodyMedium" 
+              <Text
+                variant="bodyMedium"
                 style={[styles.checkboxLabel, { color: theme.colors.onSurface }]}
                 onPress={() => setExportData(!exportData)}
               >
@@ -316,6 +315,7 @@ export const AccountDeletionForm: React.FC<AccountDeletionFormProps> = ({
                     />
                   )}
                   onPress={() => setShowPassword(!showPassword)}
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
                 />
               }
               style={styles.input}
@@ -332,13 +332,13 @@ export const AccountDeletionForm: React.FC<AccountDeletionFormProps> = ({
               error={confirmText.length > 0 && confirmText !== CONFIRM_TEXT}
             />
 
-            <View style={styles.checkboxContainer}>
+            <View style={styles.checkboxContainer} accessible={true} accessibilityRole="checkbox" accessibilityState={{ checked: confirmDeletion }} accessibilityLabel="I understand that this action cannot be undone and all my data will be permanently deleted">
               <Checkbox
                 status={confirmDeletion ? 'checked' : 'unchecked'}
                 onPress={() => setConfirmDeletion(!confirmDeletion)}
               />
-              <Text 
-                variant="bodySmall" 
+              <Text
+                variant="bodySmall"
                 style={[styles.checkboxLabel, { color: theme.colors.onSurface }]}
                 onPress={() => setConfirmDeletion(!confirmDeletion)}
               >
@@ -348,21 +348,21 @@ export const AccountDeletionForm: React.FC<AccountDeletionFormProps> = ({
 
             <View style={styles.buttonContainer}>
               <Button
-                mode="outlined"
+                variant="secondary"
                 onPress={handleCancel}
                 style={styles.button}
                 disabled={loading}
               >
                 Cancel
               </Button>
-              
+
               <Button
-                mode="contained"
+                variant="danger"
                 onPress={handleDeleteAccount}
                 style={styles.button}
                 loading={loading}
                 disabled={loading}
-                buttonColor={theme.colors.error}
+                accessibilityHint="This action cannot be undone"
               >
                 Delete Account
               </Button>

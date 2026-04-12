@@ -145,6 +145,11 @@ export default function InfoScreen() {
 
   return (
     <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
       {/* Custom Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -156,12 +161,6 @@ export default function InfoScreen() {
           </View>
         </View>
       </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
         {/* Search Section */}
         <Card style={styles.searchCard}>
           <Card.Content style={styles.searchContent}>
@@ -189,11 +188,13 @@ export default function InfoScreen() {
                     <TextInput.Icon
                       icon={isVoiceSearching ? "loading" : "microphone"}
                       onPress={handleVoiceSearch}
+                      accessibilityLabel={isVoiceSearching ? "Voice search in progress" : "Voice search"}
                     />
                     <TextInput.Icon
                       icon={loading ? "loading" : "magnify"}
                       onPress={() => handleSearch()}
                       disabled={!searchQuery.trim() || loading}
+                      accessibilityLabel="Search"
                     />
                   </View>
                 }
@@ -208,6 +209,8 @@ export default function InfoScreen() {
                     key={index}
                     style={styles.suggestionItem}
                     onPress={() => handleSuggestion(suggestion)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Search for ${suggestion}`}
                   >
                     <MaterialCommunityIcons 
                       name="pill" 
@@ -240,6 +243,8 @@ export default function InfoScreen() {
                       style={styles.recentChip}
                       textStyle={styles.recentChipText}
                       selectedColor={colors.primary[600]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Search for ${search}`}
                     >
                       {search}
                     </Chip>
@@ -259,10 +264,9 @@ export default function InfoScreen() {
                 {loading ? 'Searching...' : 'Search'}
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 onPress={handleClear}
                 disabled={loading}
-                style={styles.clearButton}
               >
                 Clear
               </Button>
@@ -285,6 +289,7 @@ export default function InfoScreen() {
                 size={16}
                 onPress={clearError}
                 iconColor={colors.error[500]}
+                accessibilityLabel="Dismiss error"
               />
             </Card.Content>
           </Card>
@@ -435,11 +440,11 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.neutral[50],
-    paddingTop: 50, // Safe area for status bar
+    paddingTop: 20,
     paddingBottom: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.neutral[900],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral[200],
   },
   headerContent: {
     flexDirection: 'row',
@@ -450,15 +455,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.neutral[900],
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.neutral[500],
-    lineHeight: 22,
   },
   scrollView: {
     flex: 1,
@@ -469,7 +473,7 @@ const styles = StyleSheet.create({
   searchCard: {
     marginBottom: 20,
     borderRadius: 16,
-    elevation: 4,
+    elevation: 2,
     shadowColor: colors.neutral[900],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -484,8 +488,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   searchTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: colors.neutral[900],
     marginLeft: 12,
   },
@@ -496,7 +500,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral[50],
     borderColor: colors.primary[200],
     borderWidth: 2,
-    borderRadius: 12,
+    borderRadius: 16,
     elevation: 2,
     shadowColor: colors.primary[500],
     shadowOffset: { width: 0, height: 2 },
@@ -509,7 +513,7 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     backgroundColor: colors.neutral[50],
-    borderRadius: 12,
+    borderRadius: 16,
     marginTop: 8,
     padding: 8,
     borderWidth: 1,
@@ -566,12 +570,10 @@ const styles = StyleSheet.create({
   searchButton: {
     flex: 1,
   },
-  clearButton: {
-    borderColor: colors.neutral[300],
-  },
+  clearButton: {},
   errorCard: {
     marginBottom: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.error[200],
     backgroundColor: colors.error[50],
@@ -590,7 +592,7 @@ const styles = StyleSheet.create({
   },
   loadingCard: {
     marginBottom: 20,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   loadingContent: {
     alignItems: 'center',
@@ -612,7 +614,7 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     borderRadius: 16,
-    elevation: 4,
+    elevation: 2,
     shadowColor: colors.neutral[900],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -691,8 +693,8 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: colors.neutral[700],
     marginBottom: 12,
     textAlign: 'center',

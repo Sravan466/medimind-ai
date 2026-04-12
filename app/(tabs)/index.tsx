@@ -1,7 +1,7 @@
 // Home/Dashboard Screen for MediMind AI - Inspired by MacroFactor's clean dashboard
 
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, Image, TouchableOpacity } from 'react-native';
 import { Text, Surface, Card, Chip, ActivityIndicator, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
@@ -103,6 +103,14 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
             {/* Custom Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -114,15 +122,6 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
                  {/* Overview Card */}
          <Card style={styles.overviewCard}>
            <Card.Content style={styles.overviewContent}>
@@ -136,17 +135,17 @@ export default function HomeScreen() {
              </View>
              
              <View style={styles.overviewStats}>
-               <View style={styles.statItem}>
+               <View style={styles.statItem} accessibilityLabel={`${getActiveMedicines().length} active medicines`}>
                  <Text style={styles.statNumber}>{getActiveMedicines().length}</Text>
                  <Text style={styles.statLabel}>Active</Text>
                </View>
                <View style={styles.statDivider} />
-               <View style={styles.statItem}>
+               <View style={styles.statItem} accessibilityLabel={`${medicines.length} total medicines`}>
                  <Text style={styles.statNumber}>{medicines.length}</Text>
                  <Text style={styles.statLabel}>Total</Text>
                </View>
                <View style={styles.statDivider} />
-               <View style={styles.statItem}>
+               <View style={styles.statItem} accessibilityLabel={`${medicines.filter(m => m.is_active && m.times && m.times.length > 0).length} scheduled medicines`}>
                  <Text style={styles.statNumber}>
                    {medicines.filter(m => m.is_active && m.times && m.times.length > 0).length}
                  </Text>
@@ -162,9 +161,8 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>Today Medicines</Text>
               <Button
                 variant="outline"
+                size="sm"
                 onPress={refreshTodayMedicines}
-                style={styles.refreshButton}
-                labelStyle={styles.smallButtonText}
               >
                 Refresh
               </Button>
@@ -207,6 +205,8 @@ export default function HomeScreen() {
                                 iconColor={colors.success[600]}
                                 onPress={() => markAsTaken(medicine.id)}
                                 style={styles.checkboxButton}
+                                accessibilityLabel="Mark as taken"
+                                accessibilityHint="Marks this medicine dose as taken"
                               />
                               <IconButton
                                 icon="close-circle-outline"
@@ -214,6 +214,8 @@ export default function HomeScreen() {
                                 iconColor={colors.error[600]}
                                 onPress={() => markAsSkipped(medicine.id)}
                                 style={styles.checkboxButton}
+                                accessibilityLabel="Skip dose"
+                                accessibilityHint="Marks this medicine dose as skipped"
                               />
                             </View>
                           )}
@@ -280,49 +282,49 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.actionGrid}>
-            <View style={styles.actionButton} onTouchEnd={handleAddMedicine}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleAddMedicine} accessibilityRole="button" accessibilityLabel="Add Medicine" accessibilityHint="Navigate to add medicine screen">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons 
-                  name="plus-circle" 
-                  size={32} 
-                  color={colors.primary[500]} 
+                <MaterialCommunityIcons
+                  name="plus-circle"
+                  size={32}
+                  color={colors.primary[500]}
                 />
                 <Text style={styles.actionButtonText}>Add Medicine</Text>
               </View>
-            </View>
-            
-            <View style={styles.actionButton} onTouchEnd={() => router.push('/(tabs)/medicines')}>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/medicines')} accessibilityRole="button" accessibilityLabel="View All Medicines" accessibilityHint="Navigate to medicines list">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons 
-                  name="pill" 
-                  size={32} 
-                  color={colors.info[500]} 
+                <MaterialCommunityIcons
+                  name="pill"
+                  size={32}
+                  color={colors.info[500]}
                 />
                 <Text style={styles.actionButtonText}>View All</Text>
               </View>
-            </View>
-            
-            <View style={styles.actionButton} onTouchEnd={() => router.push('/(tabs)/chat')}>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/chat')} accessibilityRole="button" accessibilityLabel={`Ask ${APP_CONFIG.AI_ASSISTANT.NAME}`} accessibilityHint="Navigate to AI chat assistant">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons 
-                  name="chat" 
-                  size={32} 
-                  color={colors.success[500]} 
+                <MaterialCommunityIcons
+                  name="chat"
+                  size={32}
+                  color={colors.success[500]}
                 />
                 <Text style={styles.actionButtonText}>Ask {APP_CONFIG.AI_ASSISTANT.NAME}</Text>
               </View>
-            </View>
-            
-            <View style={styles.actionButton} onTouchEnd={() => router.push('/(tabs)/info')}>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/info')} accessibilityRole="button" accessibilityLabel="Medicine Info" accessibilityHint="Navigate to medicine information">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons 
-                  name="information" 
-                  size={32} 
-                  color={colors.warning[500]} 
+                <MaterialCommunityIcons
+                  name="information"
+                  size={32}
+                  color={colors.warning[500]}
                 />
                 <Text style={styles.actionButtonText}>Medicine Info</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -333,9 +335,8 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>Recent Medicines</Text>
                              <Button
                  variant="outline"
+                 size="sm"
                  onPress={() => router.push('/(tabs)/medicines')}
-                 style={styles.viewAllButton}
-                 labelStyle={styles.smallButtonText}
                >
                  View All
                </Button>
@@ -346,7 +347,9 @@ export default function HomeScreen() {
                 <Card
                   key={medicine.id}
                   style={styles.medicineCard}
-                  onTouchEnd={() => handleViewMedicine(medicine)}
+                  onPress={() => handleViewMedicine(medicine)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${medicine.name}, ${medicine.dosage}, ${medicine.is_active ? 'Active' : 'Inactive'}`}
                 >
                   <Card.Content style={styles.medicineContent}>
                     <View style={styles.medicineHeader}>
@@ -401,12 +404,11 @@ export default function HomeScreen() {
                 />
                                  <Button
                    variant="outline"
+                   size="sm"
                    onPress={() => {
                      // Generate new tip
                      healthTipsService.generateDailyHealthTip(user?.id);
                    }}
-                   style={styles.viewAllButton}
-                   labelStyle={styles.smallButtonText}
                  >
                    New Tip
                  </Button>
@@ -452,9 +454,8 @@ export default function HomeScreen() {
             </Text>
             <Button
               variant="primary"
+              size="lg"
               onPress={handleAddMedicine}
-              style={styles.addButton}
-              labelStyle={styles.addButtonText}
               icon="plus"
             >
               Add Your First Medicine
@@ -484,11 +485,11 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.neutral[50],
-    paddingTop: 40, // Reduced from 50 to fix extra white spacing
+    paddingTop: 20,
     paddingBottom: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.neutral[900],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral[200],
   },
   headerContent: {
     flexDirection: 'row',
@@ -499,16 +500,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greetingContainer: {
-    marginBottom: 4,
+    marginBottom: 0,
   },
   greeting: {
-    fontSize: 16,
-    color: colors.neutral[600],
+    fontSize: 14,
+    color: colors.neutral[500],
+    fontWeight: '400',
   },
   userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.neutral[900],
+    marginTop: 2,
   },
   headerRight: {
     flexDirection: 'row',
@@ -576,15 +579,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: colors.neutral[900],
   },
-  viewAllButton: {
-    minWidth: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
+  viewAllButton: {},
   actionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -593,10 +592,10 @@ const styles = StyleSheet.create({
   actionButton: {
     width: '48%',
     backgroundColor: colors.neutral[50],
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.neutral[200],
-    padding: 16,
+    padding: 20,
   },
   actionButtonContent: {
     alignItems: 'center',
@@ -613,15 +612,15 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   medicineCard: {
-    borderRadius: 12,
-    elevation: 1,
+    borderRadius: 16,
+    elevation: 2,
     shadowColor: colors.neutral[900],
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
   },
   medicineContent: {
-    padding: 16,
+    padding: 20,
   },
   medicineHeader: {
     flexDirection: 'row',
@@ -687,26 +686,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     lineHeight: 24,
   },
-  addButton: {
-    minWidth: 200,
-    backgroundColor: colors.primary[500],
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    elevation: 4,
-    shadowColor: colors.primary[500],
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  addButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
-  },
+  addButton: {},
+  addButtonText: {},
   healthTipCard: {
-    borderRadius: 12,
+    borderRadius: 16,
     elevation: 1,
     shadowColor: colors.neutral[900],
     shadowOffset: { width: 0, height: 1 },
@@ -717,7 +700,7 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.warning[400],
   },
   healthTipContent: {
-    padding: 16,
+    padding: 20,
   },
   healthTipHeader: {
     flexDirection: 'row',
@@ -758,18 +741,13 @@ const styles = StyleSheet.create({
      marginRight: 8,
    },
    // Today Medicines Styles
-   refreshButton: {
-     minWidth: 0,
-     paddingHorizontal: 12,
-   },
-   smallButtonText: {
-     fontSize: 12,
-   },
+   refreshButton: {},
+   smallButtonText: {},
    todayMedicinesList: {
      gap: 12,
    },
    todayMedicineCard: {
-     borderRadius: 12,
+     borderRadius: 16,
      elevation: 1,
      shadowColor: colors.neutral[900],
      shadowOffset: { width: 0, height: 1 },
@@ -777,7 +755,7 @@ const styles = StyleSheet.create({
      shadowRadius: 4,
    },
    todayMedicineContent: {
-     padding: 16,
+     padding: 20,
    },
    todayMedicineHeader: {
      flexDirection: 'row',
@@ -837,7 +815,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       padding: 32,
       backgroundColor: colors.neutral[50],
-      borderRadius: 12,
+      borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.neutral[200],
       borderStyle: 'dashed',
@@ -858,9 +836,9 @@ const styles = StyleSheet.create({
     // Completed medicines styles
     completedSection: {
       marginTop: 16,
-      padding: 16,
+      padding: 20,
       backgroundColor: colors.neutral[50],
-      borderRadius: 12,
+      borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.neutral[200],
     },

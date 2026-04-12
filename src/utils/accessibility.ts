@@ -201,6 +201,22 @@ export const accessibilityHelper = {
   },
 
   /**
+   * Get accessibility props for Chip/toggle components
+   */
+  getChipAccessibilityProps(
+    label: string,
+    selected: boolean,
+    role: 'radio' | 'checkbox' | 'button' = 'button'
+  ) {
+    return {
+      accessible: true,
+      accessibilityLabel: label,
+      accessibilityRole: role as any,
+      accessibilityState: { selected },
+    };
+  },
+
+  /**
    * Get accessibility-enhanced button props
    */
   getButtonAccessibilityProps(

@@ -14,9 +14,9 @@ export default function TabsLayout() {
           tabBarActiveTintColor: colors.primary[500],
           tabBarInactiveTintColor: colors.neutral[500],
           tabBarStyle: {
-            backgroundColor: colors.neutral[200],
-            borderTopWidth: 2,
-            borderTopColor: colors.neutral[900],
+            backgroundColor: colors.neutral[50],
+            borderTopWidth: 1,
+            borderTopColor: colors.neutral[200],
             paddingBottom: 8,
             paddingTop: 8,
             height: 70,
@@ -26,6 +26,7 @@ export default function TabsLayout() {
             shadowOpacity: 0.08,
             shadowRadius: 4,
           },
+          freezeOnBlur: true, // Freeze inactive tabs to prevent screen readers from reading hidden content
           headerShown: false, // Hide the header/navbar
           headerStyle: {
             backgroundColor: colors.neutral[200],
@@ -49,8 +50,9 @@ export default function TabsLayout() {
           name="index"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="home" size={size} color={color} />
+            tabBarAccessibilityLabel: 'Home tab',
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
             ),
           }}
         />
@@ -58,8 +60,9 @@ export default function TabsLayout() {
           name="medicines"
           options={{
             title: 'Medicines',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="pill" size={size} color={color} />
+            tabBarAccessibilityLabel: 'Medicines tab',
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'pill' : 'pill'} size={size} color={color} />
             ),
           }}
         />
@@ -67,22 +70,19 @@ export default function TabsLayout() {
           name="info"
           options={{
             title: 'Info',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="information" size={size} color={color} />
+            tabBarAccessibilityLabel: 'Info tab',
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'information' : 'information-outline'} size={size} color={color} />
             ),
-            tabBarLabelStyle: {
-              fontSize: 9, // Reduced text size for info tab
-              fontWeight: '500',
-              marginTop: 2,
-            },
           }}
         />
         <Tabs.Screen
           name="chat"
           options={{
             title: 'Cura',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="chat" size={size} color={color} />
+            tabBarAccessibilityLabel: 'Cura chat tab',
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'chat' : 'chat-outline'} size={size} color={color} />
             ),
           }}
         />
@@ -90,14 +90,10 @@ export default function TabsLayout() {
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account" size={size} color={color} />
+            tabBarAccessibilityLabel: 'Profile tab',
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'account' : 'account-outline'} size={size} color={color} />
             ),
-            tabBarLabelStyle: {
-              fontSize: 9, // Reduced text size for profile tab
-              fontWeight: '500',
-              marginTop: 2,
-            },
           }}
         />
         

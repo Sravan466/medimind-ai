@@ -370,6 +370,9 @@ export default function EditMedicineScreen() {
                         styles.chipText,
                         formData.frequency === freq.value && styles.selectedChipText
                       ]}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected: formData.frequency === freq.value }}
+                      accessibilityLabel={freq.label}
                     >
                       {freq.label}
                     </Chip>
@@ -406,6 +409,7 @@ export default function EditMedicineScreen() {
                         style={styles.timeChip}
                         mode="outlined"
                         textStyle={styles.chipText}
+                        accessibilityLabel={`Scheduled time: ${formatTime(time)}. Tap to edit, close to remove`}
                       >
                         {formatTime(time)}
                       </Chip>
@@ -452,6 +456,9 @@ export default function EditMedicineScreen() {
                         styles.chipText,
                         formData.daysOfWeek.includes(day.value) && styles.selectedChipText
                       ]}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: formData.daysOfWeek.includes(day.value) }}
+                      accessibilityLabel={day.label || day.short}
                     >
                       {day.short}
                     </Chip>
@@ -568,7 +575,7 @@ export default function EditMedicineScreen() {
         {/* Actions */}
         <View style={styles.actions}>
           <Button
-            variant="outline"
+            variant="secondary"
             onPress={() => router.back()}
             style={styles.cancelButton}
             disabled={loading}
@@ -580,8 +587,6 @@ export default function EditMedicineScreen() {
             onPress={handleSubmit}
             loading={loading}
             style={styles.submitButton}
-            labelStyle={styles.submitButtonText}
-
           >
             Update
           </Button>
@@ -791,14 +796,9 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    borderColor: colors.neutral[300],
   },
   submitButton: {
     flex: 1,
-  },
-  submitButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   submitButtonContent: {
     paddingHorizontal: 12,

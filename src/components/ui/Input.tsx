@@ -20,6 +20,8 @@ interface InputProps {
   right?: React.ReactNode;
   fullWidth?: boolean;
   variant?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 const InputComponent: React.FC<InputProps> = ({
@@ -40,12 +42,14 @@ const InputComponent: React.FC<InputProps> = ({
   right,
   fullWidth = false,
   variant,
+  accessibilityLabel: accessibilityLabelProp,
+  accessibilityHint,
 }) => {
   const getInputStyle = (): any => {
     const baseStyle: any = {
       borderWidth: 1,
       borderColor: error ? colors.error[500] : colors.neutral[300],
-      borderRadius: 8,
+      borderRadius: 12,
       paddingHorizontal: 16,
       paddingVertical: 12,
       fontSize: 16,
@@ -65,7 +69,7 @@ const InputComponent: React.FC<InputProps> = ({
   return (
     <View style={styles.container}>
       {label && (
-        <Text style={[styles.label, labelStyle]}>
+        <Text style={[styles.label, labelStyle]} importantForAccessibility="no">
           {label}
         </Text>
       )}
@@ -83,6 +87,9 @@ const InputComponent: React.FC<InputProps> = ({
           numberOfLines={numberOfLines}
           autoCapitalize={autoCapitalize}
           autoCorrect={autoCorrect}
+          accessible={true}
+          accessibilityLabel={accessibilityLabelProp || label || placeholder}
+          accessibilityHint={accessibilityHint}
         />
         {right && (
           <View style={styles.rightContainer}>
@@ -91,7 +98,7 @@ const InputComponent: React.FC<InputProps> = ({
         )}
       </View>
       {error && (
-        <Text style={styles.error}>
+        <Text style={styles.error} accessibilityRole="alert" accessibilityLiveRegion="polite">
           {typeof error === 'string' ? error : 'This field is required'}
         </Text>
       )}
