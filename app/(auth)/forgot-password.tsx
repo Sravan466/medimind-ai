@@ -234,8 +234,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   footer: {
-    borderTopWidth: 1,
-    borderTopColor: colors.neutral[200],
     paddingTop: 24,
   },
   backButton: {

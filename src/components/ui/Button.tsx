@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle, AccessibilityInfo } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, borderRadius as br } from '../../styles/theme';
 
@@ -145,6 +145,21 @@ export const Button: React.FC<ButtonProps> = ({
   const isTextVariant = variant === 'text';
   const isFilled = variant === 'primary' || variant === 'danger';
 
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    AccessibilityInfo.isReduceMotionEnabled?.()
+      .then((v) => { if (mounted) setReduceMotion(!!v); })
+      .catch(() => {});
+    const sub = AccessibilityInfo.addEventListener?.('reduceMotionChanged', (v) => setReduceMotion(!!v));
+    return () => { mounted = false; sub?.remove?.(); };
+  }, []);
+
+  const disabledFillBg =
+    variant === 'primary' ? colors.primary[200]
+    : variant === 'danger' ? colors.error[200]
+    : undefined;
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -174,10 +189,12 @@ export const Button: React.FC<ButtonProps> = ({
         // Pressed state
         pressed && !disabled && {
           backgroundColor: variantConfig.pressedBg,
-          transform: [{ scale: variantConfig.pressedScale }],
+          ...(reduceMotion ? null : { transform: [{ scale: variantConfig.pressedScale }] }),
         },
-        // Disabled
-        disabled && styles.disabled,
+        // Disabled — filled variants get a tinted fill instead of opacity
+        disabled && (disabledFillBg
+          ? { backgroundColor: disabledFillBg, shadowOpacity: 0, elevation: 0 }
+          : styles.disabled),
         // User overrides
         style,
       ]}

@@ -40,7 +40,7 @@ export default function TabsLayout() {
             fontSize: 16, // Reduced from 18
           },
           tabBarLabelStyle: {
-            fontSize: 10, // Reduced from 11
+            fontSize: 11,
             fontWeight: '500',
             marginTop: 2,
           },
@@ -62,7 +62,7 @@ export default function TabsLayout() {
             title: 'Medicines',
             tabBarAccessibilityLabel: 'Medicines tab',
             tabBarIcon: ({ color, size, focused }) => (
-              <MaterialCommunityIcons name={focused ? 'pill' : 'pill'} size={size} color={color} />
+              <MaterialCommunityIcons name={focused ? 'pill' : 'pill-multiple-outline'} size={size} color={color} />
             ),
           }}
         />
