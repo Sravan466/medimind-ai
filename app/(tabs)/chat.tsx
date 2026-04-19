@@ -27,6 +27,7 @@ import { medicineService } from '../../src/services/supabase';
 import { Medicine } from '../../src/types/database';
 import { colors } from '../../src/styles/theme';
 import { APP_CONFIG } from '../../src/utils/constants';
+import { ScreenHeader } from '../../src/components/ui/ScreenHeader';
 
 export default function ChatScreen() {
   const {
@@ -197,34 +198,19 @@ export default function ChatScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Custom Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <View style={styles.headerInfo}>
-              <Image 
-                source={require('../../assets/ai-avatar.png')} 
-                style={styles.headerAvatar}
-              />
-              <View style={styles.headerText}>
-                <Text style={styles.headerTitle}>{APP_CONFIG.AI_ASSISTANT.NAME}</Text>
-                <Text style={styles.headerSubtitle}>
-                  {APP_CONFIG.AI_ASSISTANT.TAGLINE}
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.headerRight}>
-            <IconButton
-              icon="delete-sweep"
-              size={24}
-              onPress={handleClearChat}
-              iconColor={colors.neutral[600]}
-              accessibilityLabel="Clear chat history"
-            />
-          </View>
-        </View>
-      </View>
+      <ScreenHeader
+        title={APP_CONFIG.AI_ASSISTANT.NAME}
+        subtitle={APP_CONFIG.AI_ASSISTANT.TAGLINE}
+        right={
+          <IconButton
+            icon="dots-horizontal"
+            size={24}
+            onPress={handleClearChat}
+            iconColor={colors.neutral[600]}
+            accessibilityLabel="Chat options"
+          />
+        }
+      />
 
       {/* Medicine Context Banner - Auto-hide after 3 seconds */}
       {userMedicines.length > 0 && showMedicineBanner && (
@@ -351,27 +337,30 @@ export default function ChatScreen() {
           </View>
         )}
 
-        {/* Input Section */}
+        {/* Input Section — pill input + circular send */}
         <View style={styles.inputContainer}>
           <View style={styles.inputContent}>
             <TextInput
               mode="outlined"
-              placeholder="Ask about your medicines, side effects, interactions..."
+              placeholder="Ask about your medicines..."
               value={inputText}
               onChangeText={setInputText}
               onSubmitEditing={handleSend}
               multiline={false}
               maxLength={500}
-              style={styles.input}
+              style={[styles.input, { borderRadius: 24 }]}
               contentStyle={styles.inputContentStyle}
-              right={
-                <TextInput.Icon
-                  icon={isLoading ? "loading" : "send"}
-                  onPress={handleSend}
-                  disabled={!inputText.trim() || isLoading}
-                  accessibilityLabel="Send message"
-                />
-              }
+              outlineStyle={{ borderRadius: 24 }}
+            />
+            <IconButton
+              icon={isLoading ? 'loading' : 'send'}
+              size={22}
+              onPress={handleSend}
+              disabled={!inputText.trim() || isLoading}
+              iconColor={inputText.trim() ? '#FFFFFF' : colors.neutral[400]}
+              containerColor={inputText.trim() ? colors.primary[600] : colors.neutral[200]}
+              style={{ width: 40, height: 40, borderRadius: 20 }}
+              accessibilityLabel="Send message"
             />
           </View>
         </View>
