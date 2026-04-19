@@ -73,8 +73,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   logo: {
-    width: 56,
-    height: 56,
+    width: 80,
+    height: 80,
+    borderRadius: 20,
     marginBottom: spacing.md,
   },
   title: {

@@ -67,6 +67,7 @@ export default function RegisterScreen() {
     <AuthScaffold
       title="Create Account"
       subtitle="Join MediMind to manage your medications"
+      logo={require('../../assets/icon.png')}
       errorMessage={error || undefined}
       onDismissError={clearError}
       footer={

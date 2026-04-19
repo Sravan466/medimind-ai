@@ -63,6 +63,7 @@ export default function LoginScreen() {
     <AuthScaffold
       title="Welcome Back"
       subtitle="Sign in to your MediMind account"
+      logo={require('../../assets/icon.png')}
       errorMessage={error || undefined}
       onDismissError={clearError}
       footer={
