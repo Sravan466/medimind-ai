@@ -62,7 +62,7 @@ export default function TabsLayout() {
             title: 'Medicines',
             tabBarAccessibilityLabel: 'Medicines tab',
             tabBarIcon: ({ color, size, focused }) => (
-              <MaterialCommunityIcons name={focused ? 'pill' : 'pill-multiple-outline'} size={size} color={color} />
+              <MaterialCommunityIcons name={focused ? 'pill' : 'pill-multiple'} size={size} color={color} />
             ),
           }}
         />
