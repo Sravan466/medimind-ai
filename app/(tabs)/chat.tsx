@@ -566,10 +566,12 @@ const styles = StyleSheet.create({
     borderTopColor: colors.neutral[100],
   },
   inputContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.neutral[50],
-    borderRadius: 24,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    gap: 8,
   },
   inputContentStyle: {
     paddingVertical: 0,
@@ -577,6 +579,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
+    flex: 1,
     backgroundColor: colors.neutral[50],
     borderRadius: 20,
     margin: 0,
