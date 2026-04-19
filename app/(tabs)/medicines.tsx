@@ -1,6 +1,6 @@
 // Medicines Screen for MediMind AI
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { Text, Surface, FAB, Card, Chip, IconButton, Menu, Divider } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,6 +11,10 @@ import { useNotifications } from '../../src/hooks/useNotifications';
 import { Medicine } from '../../src/types/database';
 import { colors } from '../../src/styles/theme';
 import { Button } from '../../src/components/ui/Button';
+import { ScreenHeader } from '../../src/components/ui/ScreenHeader';
+import { EmptyState } from '../../src/components/ui/EmptyState';
+import { FilterChipBar } from '../../src/components/ui/FilterChipBar';
+import { MedicineCard } from '../../src/components/ui/MedicineCard';
 
 export default function MedicinesScreen() {
   const { user } = useAuthContext();
@@ -19,6 +23,26 @@ export default function MedicinesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [menuVisible, setMenuVisible] = useState<string | null>(null);
+  const [filter, setFilter] = useState('All');
+
+  const FILTER_ITEMS = ['All', 'Morning', 'Afternoon', 'Evening', 'Night', 'As needed'];
+
+  const filteredMedicines = useMemo(() => {
+    if (filter === 'All') return medicines;
+    if (filter === 'As needed') return medicines.filter(m => m.frequency?.toLowerCase() === 'as needed');
+    // Filter by time-of-day bucket
+    return medicines.filter(m => {
+      if (!m.times || m.times.length === 0) return false;
+      return m.times.some(t => {
+        const h = parseInt(t.split(':')[0], 10);
+        if (filter === 'Morning') return h >= 5 && h < 12;
+        if (filter === 'Afternoon') return h >= 12 && h < 17;
+        if (filter === 'Evening') return h >= 17 && h < 21;
+        if (filter === 'Night') return h >= 21 || h < 5;
+        return false;
+      });
+    });
+  }, [medicines, filter]);
 
   useEffect(() => {
     loadMedicines();
@@ -148,48 +172,32 @@ export default function MedicinesScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-      {/* Custom Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>My Medicines</Text>
-            <Text style={styles.headerSubtitle}>
-              {medicines.length} medicine{medicines.length !== 1 ? 's' : ''} in your list
-            </Text>
-          </View>
-          <View style={styles.headerRight}>
-            <IconButton
-              icon="plus-circle-outline"
-              size={24}
-              onPress={handleAddMedicine}
-              iconColor={colors.primary[500]}
-              style={styles.headerAddButton}
-              accessibilityLabel="Add new medicine"
-            />
-          </View>
-        </View>
-      </View>
-        {medicines.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconContainer}>
-              <MaterialCommunityIcons name="pill" size={48} color={colors.neutral[400]} />
-            </View>
-            <Text style={styles.emptyTitle}>No Medicines Added Yet</Text>
-            <Text style={styles.emptySubtitle}>
-              Start by adding your first medicine to track your health journey
-            </Text>
-            <Button
-              variant="primary"
-              size="lg"
-              onPress={handleAddMedicine}
-              icon="plus"
-            >
-              Add Your First Medicine
-            </Button>
-          </View>
+      <ScreenHeader
+        title="My medicines"
+        subtitle="Track your daily medications"
+        right={
+          <Button size="sm" icon="plus" onPress={handleAddMedicine}>
+            Add
+          </Button>
+        }
+      />
+
+      <FilterChipBar items={FILTER_ITEMS} value={filter} onChange={setFilter} />
+
+        {filteredMedicines.length === 0 ? (
+          <EmptyState
+            illustration="pill"
+            title={filter === 'All' ? 'No medicines yet' : `No ${filter.toLowerCase()} medicines`}
+            description={filter === 'All' ? 'Start by adding your first medicine to track your health journey' : 'Try a different filter or add a medicine'}
+            action={filter === 'All' ? (
+              <Button variant="primary" size="lg" onPress={handleAddMedicine} icon="plus">
+                Add Your First Medicine
+              </Button>
+            ) : undefined}
+          />
         ) : (
           <View style={styles.medicinesList}>
-            {medicines.map((medicine) => (
+            {filteredMedicines.map((medicine) => (
               <Card key={medicine.id} style={styles.medicineCard} accessibilityLabel={`${medicine.name}, ${medicine.dosage}, ${medicine.is_active ? 'Active' : 'Inactive'}`}>
                 <Card.Content style={styles.medicineContent}>
                   <View style={styles.medicineHeader}>
