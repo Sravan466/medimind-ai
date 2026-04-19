@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Text, Card, Avatar, IconButton, Switch, Divider, ActivityIndicator, useTheme } from 'react-native-paper';
+import { Text, Card, Avatar, IconButton, Switch, Divider, ActivityIndicator, Portal, Dialog, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthContext } from '../../src/contexts/AuthContext';
 import { useSettingsContext } from '../../src/contexts/SettingsContext';
@@ -24,6 +24,8 @@ export default function ProfileScreen() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
   const [showDobPicker, setShowDobPicker] = useState(false);
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const parseDob = (dob: string): Date => {
     const d = dob ? new Date(dob) : new Date();
@@ -89,26 +91,18 @@ export default function ProfileScreen() {
     setEditing(false);
   };
 
-  const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: signOut },
-      ]
-    );
+  const handleSignOut = () => setShowSignOutDialog(true);
+
+  const confirmSignOut = () => {
+    setShowSignOutDialog(false);
+    signOut();
   };
 
-  const handleResetSettings = () => {
-    Alert.alert(
-      'Reset Settings',
-      'Are you sure you want to reset all settings to default?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: resetSettings },
-      ]
-    );
+  const handleResetSettings = () => setShowResetDialog(true);
+
+  const confirmResetSettings = () => {
+    setShowResetDialog(false);
+    resetSettings();
   };
 
   const handleToggleHealthTips = async (value: boolean) => {
@@ -494,6 +488,44 @@ export default function ProfileScreen() {
           onCancel={() => setShowDeleteForm(false)}
         />
       )}
+
+      {/* Sign Out Confirmation */}
+      <Portal>
+        <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)} style={styles.dialog}>
+          <Dialog.Icon icon="logout" color={colors.error[600]} />
+          <Dialog.Title style={styles.dialogTitle}>Sign Out</Dialog.Title>
+          <Dialog.Content>
+            <Text style={styles.dialogBody}>Are you sure you want to sign out?</Text>
+          </Dialog.Content>
+          <Dialog.Actions style={styles.dialogActions}>
+            <Button variant="outline" size="sm" onPress={() => setShowSignOutDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" size="sm" onPress={confirmSignOut}>
+              Sign Out
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      {/* Reset Settings Confirmation */}
+      <Portal>
+        <Dialog visible={showResetDialog} onDismiss={() => setShowResetDialog(false)} style={styles.dialog}>
+          <Dialog.Icon icon="refresh" color={colors.warning[600]} />
+          <Dialog.Title style={styles.dialogTitle}>Reset Settings</Dialog.Title>
+          <Dialog.Content>
+            <Text style={styles.dialogBody}>Are you sure you want to reset all settings to default?</Text>
+          </Dialog.Content>
+          <Dialog.Actions style={styles.dialogActions}>
+            <Button variant="outline" size="sm" onPress={() => setShowResetDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" size="sm" onPress={confirmResetSettings}>
+              Reset
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 }
@@ -673,4 +705,24 @@ const styles = StyleSheet.create({
     borderColor: colors.error[300],
   },
   deleteActionButton: {},
+  dialog: {
+    borderRadius: 16,
+  },
+  dialogTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  dialogBody: {
+    textAlign: 'center',
+    fontSize: 15,
+    color: colors.neutral[600],
+    lineHeight: 22,
+  },
+  dialogActions: {
+    justifyContent: 'center',
+    gap: 12,
+    paddingBottom: 20,
+    paddingHorizontal: 24,
+  },
 });
