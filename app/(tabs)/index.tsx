@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, Image, TouchableOpacity, Animated, AccessibilityInfo } from 'react-native';
 import { motion } from '../../src/styles/theme';
-import { Text, Surface, Card, Chip, ActivityIndicator, IconButton } from 'react-native-paper';
+import { Text, Surface, Card, ActivityIndicator, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuthContext } from '../../src/contexts/AuthContext';
@@ -370,14 +370,17 @@ export default function HomeScreen() {
                         <Text style={styles.medicineName}>{medicine.name}</Text>
                         <Text style={styles.medicineDosage}>{medicine.dosage}</Text>
                       </View>
-                      <Chip
-                        mode="outlined"
-                        style={styles.statusChip}
-                        textStyle={styles.statusChipText}
-                        selectedColor={medicine.is_active ? colors.success[600] : colors.neutral[500]}
-                      >
-                        {medicine.is_active ? 'Active' : 'Inactive'}
-                      </Chip>
+                      <View style={[
+                        styles.statusPill,
+                        { borderColor: medicine.is_active ? colors.success[600] : colors.neutral[400] },
+                      ]}>
+                        <Text style={[
+                          styles.statusPillText,
+                          { color: medicine.is_active ? colors.success[600] : colors.neutral[500] },
+                        ]}>
+                          {medicine.is_active ? 'Active' : 'Inactive'}
+                        </Text>
+                      </View>
                     </View>
                     
                     <View style={styles.medicineDetails}>
@@ -440,13 +443,11 @@ export default function HomeScreen() {
                 </View>
                 <Text style={styles.healthTipText}>{currentTip.content}</Text>
                 <View style={styles.healthTipFooter}>
-                  <Chip
-                    mode="outlined"
-                    style={styles.categoryChip}
-                    textStyle={styles.categoryChipText}
-                  >
-                    {currentTip.category.replace('_', ' ').toUpperCase()}
-                  </Chip>
+                  <View style={styles.categoryPill}>
+                    <Text style={styles.categoryPillText}>
+                      {currentTip.category.replace('_', ' ').toUpperCase()}
+                    </Text>
+                  </View>
                 </View>
               </Card.Content>
             </Card>
@@ -662,11 +663,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.neutral[600],
   },
-  statusChip: {
+  statusPill: {
     marginLeft: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
   },
-  statusChipText: {
+  statusPillText: {
     fontSize: 12,
+    fontWeight: '500',
   },
   medicineDetails: {
     gap: 8,
@@ -744,11 +750,15 @@ const styles = StyleSheet.create({
   healthTipFooter: {
     alignItems: 'flex-start',
   },
-  categoryChip: {
+  categoryPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
     backgroundColor: colors.warning[100],
+    borderWidth: 1,
     borderColor: colors.warning[300],
   },
-  categoryChipText: {
+  categoryPillText: {
     fontSize: 10,
     color: colors.warning[700],
     fontWeight: '500',
