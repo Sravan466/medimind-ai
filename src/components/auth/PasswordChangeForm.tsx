@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import { TextInput, Text, Card } from 'react-native-paper';
+import { Text, Card } from 'react-native-paper';
+import { Pressable } from 'react-native';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAppTheme } from '../../styles/theme';
 import { useSettingsContext } from '../../contexts/SettingsContext';
@@ -116,73 +118,76 @@ export const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
         </Text>
 
         <View style={styles.form}>
-          <TextInput
-            mode="outlined"
+          <Input
             label="Current Password"
             value={currentPassword}
             onChangeText={setCurrentPassword}
             secureTextEntry={!showCurrentPassword}
-            right={
-              <TextInput.Icon
-                icon={() => (
-                  <MaterialCommunityIcons
-                    name={showCurrentPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color={colors.neutral[600]}
-                  />
-                )}
-                onPress={() => setShowCurrentPassword(!showCurrentPassword)}
-                accessibilityLabel={showCurrentPassword ? 'Hide current password' : 'Show current password'}
-              />
-            }
-            style={styles.input}
             disabled={loading}
+            autoCapitalize="none"
+            autoCorrect={false}
+            right={
+              <Pressable
+                onPress={() => setShowCurrentPassword(!showCurrentPassword)}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+              >
+                <MaterialCommunityIcons
+                  name={showCurrentPassword ? 'eye-off' : 'eye'}
+                  size={22}
+                  color={colors.neutral[600]}
+                />
+              </Pressable>
+            }
           />
 
-          <TextInput
-            mode="outlined"
+          <Input
             label="New Password"
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry={!showNewPassword}
-            right={
-              <TextInput.Icon
-                icon={() => (
-                  <MaterialCommunityIcons
-                    name={showNewPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color={colors.neutral[600]}
-                  />
-                )}
-                onPress={() => setShowNewPassword(!showNewPassword)}
-                accessibilityLabel={showNewPassword ? 'Hide new password' : 'Show new password'}
-              />
-            }
-            style={styles.input}
             disabled={loading}
+            autoCapitalize="none"
+            autoCorrect={false}
+            right={
+              <Pressable
+                onPress={() => setShowNewPassword(!showNewPassword)}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel={showNewPassword ? 'Hide new password' : 'Show new password'}
+              >
+                <MaterialCommunityIcons
+                  name={showNewPassword ? 'eye-off' : 'eye'}
+                  size={22}
+                  color={colors.neutral[600]}
+                />
+              </Pressable>
+            }
           />
 
-          <TextInput
-            mode="outlined"
+          <Input
             label="Confirm New Password"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
-            right={
-              <TextInput.Icon
-                icon={() => (
-                  <MaterialCommunityIcons
-                    name={showConfirmPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color={colors.neutral[600]}
-                  />
-                )}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-              />
-            }
-            style={styles.input}
             disabled={loading}
+            autoCapitalize="none"
+            autoCorrect={false}
+            right={
+              <Pressable
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+              >
+                <MaterialCommunityIcons
+                  name={showConfirmPassword ? 'eye-off' : 'eye'}
+                  size={22}
+                  color={colors.neutral[600]}
+                />
+              </Pressable>
+            }
           />
 
           <View style={styles.buttonContainer}>

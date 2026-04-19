@@ -1,7 +1,8 @@
 // Home/Dashboard Screen for MediMind AI - Inspired by MacroFactor's clean dashboard
 
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl, Image, TouchableOpacity, Animated, AccessibilityInfo } from 'react-native';
+import { motion } from '../../src/styles/theme';
 import { Text, Surface, Card, Chip, ActivityIndicator, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
@@ -92,6 +93,31 @@ export default function HomeScreen() {
       .slice(0, 3);
   };
 
+  // Animated feedback for mark-as-taken / skip
+  const [animatingId, setAnimatingId] = useState<string | null>(null);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled?.()
+      .then((v) => setReduceMotion(!!v)).catch(() => {});
+    const sub = AccessibilityInfo.addEventListener?.('reduceMotionChanged', setReduceMotion);
+    return () => { sub?.remove?.(); };
+  }, []);
+
+  const animateAction = useCallback((id: string, action: (id: string) => void) => {
+    if (reduceMotion) { action(id); return; }
+    setAnimatingId(id);
+    scaleAnim.setValue(1);
+    Animated.sequence([
+      Animated.spring(scaleAnim, { toValue: 1.35, useNativeDriver: true, speed: 50, bounciness: 12 }),
+      Animated.timing(scaleAnim, { toValue: 1, duration: motion.base, useNativeDriver: true }),
+    ]).start(() => {
+      action(id);
+      setAnimatingId(null);
+    });
+  }, [reduceMotion, scaleAnim]);
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -122,34 +148,32 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
-                 {/* Overview Card */}
+                 {/* Today's Progress */}
          <Card style={styles.overviewCard}>
            <Card.Content style={styles.overviewContent}>
              <View style={styles.overviewHeader}>
-               <MaterialCommunityIcons 
-                 name="pill" 
-                 size={24} 
-                 color={colors.primary[600]} 
+               <MaterialCommunityIcons
+                 name="chart-timeline-variant"
+                 size={24}
+                 color={colors.primary[600]}
                />
-               <Text style={styles.overviewTitle}>Medicine Overview</Text>
+               <Text style={styles.overviewTitle}>Today's Progress</Text>
              </View>
-             
+
              <View style={styles.overviewStats}>
-               <View style={styles.statItem} accessibilityLabel={`${getActiveMedicines().length} active medicines`}>
-                 <Text style={styles.statNumber}>{getActiveMedicines().length}</Text>
-                 <Text style={styles.statLabel}>Active</Text>
+               <View style={styles.statItem} accessibilityLabel={`${todayMedicines.filter(m => m.status === 'taken').length} taken`}>
+                 <Text style={styles.statNumber}>{todayMedicines.filter(m => m.status === 'taken').length}</Text>
+                 <Text style={styles.statLabel}>Taken</Text>
                </View>
                <View style={styles.statDivider} />
-               <View style={styles.statItem} accessibilityLabel={`${medicines.length} total medicines`}>
-                 <Text style={styles.statNumber}>{medicines.length}</Text>
-                 <Text style={styles.statLabel}>Total</Text>
+               <View style={[styles.statItem]} accessibilityLabel={`${todayMedicines.filter(m => m.status === 'pending' || m.status === 'due').length} upcoming`}>
+                 <Text style={[styles.statNumber, { color: colors.primary[600] }]}>{todayMedicines.filter(m => m.status === 'pending' || m.status === 'due').length}</Text>
+                 <Text style={styles.statLabel}>Upcoming</Text>
                </View>
                <View style={styles.statDivider} />
-               <View style={styles.statItem} accessibilityLabel={`${medicines.filter(m => m.is_active && m.times && m.times.length > 0).length} scheduled medicines`}>
-                 <Text style={styles.statNumber}>
-                   {medicines.filter(m => m.is_active && m.times && m.times.length > 0).length}
-                 </Text>
-                 <Text style={styles.statLabel}>Scheduled</Text>
+               <View style={styles.statItem} accessibilityLabel={`${todayMedicines.filter(m => m.status === 'skipped').length} missed`}>
+                 <Text style={styles.statNumber}>{todayMedicines.filter(m => m.status === 'skipped').length}</Text>
+                 <Text style={styles.statLabel}>Missed</Text>
                </View>
              </View>
            </Card.Content>
@@ -159,13 +183,6 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Today Medicines</Text>
-              <Button
-                variant="outline"
-                size="sm"
-                onPress={refreshTodayMedicines}
-              >
-                Refresh
-              </Button>
             </View>
             
             {todayMedicines.filter(medicine => medicine.status === 'pending' || medicine.status === 'due').length > 0 ? (
@@ -186,24 +203,28 @@ export default function HomeScreen() {
                         </View>
                         <View style={styles.checkboxContainer}>
                           {medicine.status === 'taken' ? (
-                            <MaterialCommunityIcons 
-                              name="check-circle" 
-                              size={32} 
-                              color={colors.success[600]} 
-                            />
+                            <Animated.View style={animatingId === medicine.id ? { transform: [{ scale: scaleAnim }] } : undefined}>
+                              <MaterialCommunityIcons
+                                name="check-circle"
+                                size={32}
+                                color={colors.success[600]}
+                              />
+                            </Animated.View>
                           ) : medicine.status === 'skipped' ? (
-                            <MaterialCommunityIcons 
-                              name="close-circle" 
-                              size={32} 
-                              color={colors.error[600]} 
-                            />
+                            <Animated.View style={animatingId === medicine.id ? { transform: [{ scale: scaleAnim }] } : undefined}>
+                              <MaterialCommunityIcons
+                                name="close-circle"
+                                size={32}
+                                color={colors.error[600]}
+                              />
+                            </Animated.View>
                           ) : (
                             <View style={styles.checkboxActions}>
                               <IconButton
                                 icon="check-circle-outline"
                                 size={28}
                                 iconColor={colors.success[600]}
-                                onPress={() => markAsTaken(medicine.id)}
+                                onPress={() => animateAction(medicine.id, markAsTaken)}
                                 style={styles.checkboxButton}
                                 accessibilityLabel="Mark as taken"
                                 accessibilityHint="Marks this medicine dose as taken"
@@ -212,7 +233,7 @@ export default function HomeScreen() {
                                 icon="close-circle-outline"
                                 size={28}
                                 iconColor={colors.error[600]}
-                                onPress={() => markAsSkipped(medicine.id)}
+                                onPress={() => animateAction(medicine.id, markAsSkipped)}
                                 style={styles.checkboxButton}
                                 accessibilityLabel="Skip dose"
                                 accessibilityHint="Marks this medicine dose as skipped"
@@ -284,44 +305,36 @@ export default function HomeScreen() {
           <View style={styles.actionGrid}>
             <TouchableOpacity style={styles.actionButton} onPress={handleAddMedicine} accessibilityRole="button" accessibilityLabel="Add Medicine" accessibilityHint="Navigate to add medicine screen">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons
-                  name="plus-circle"
-                  size={32}
-                  color={colors.primary[500]}
-                />
+                <View style={styles.actionIconWrap}>
+                  <MaterialCommunityIcons name="plus-circle" size={28} color={colors.primary[600]} />
+                </View>
                 <Text style={styles.actionButtonText}>Add Medicine</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/medicines')} accessibilityRole="button" accessibilityLabel="View All Medicines" accessibilityHint="Navigate to medicines list">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons
-                  name="pill"
-                  size={32}
-                  color={colors.info[500]}
-                />
+                <View style={styles.actionIconWrap}>
+                  <MaterialCommunityIcons name="pill" size={28} color={colors.primary[600]} />
+                </View>
                 <Text style={styles.actionButtonText}>View All</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/chat')} accessibilityRole="button" accessibilityLabel={`Ask ${APP_CONFIG.AI_ASSISTANT.NAME}`} accessibilityHint="Navigate to AI chat assistant">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons
-                  name="chat"
-                  size={32}
-                  color={colors.success[500]}
-                />
+                <View style={styles.actionIconWrap}>
+                  <MaterialCommunityIcons name="chat" size={28} color={colors.primary[600]} />
+                </View>
                 <Text style={styles.actionButtonText}>Ask {APP_CONFIG.AI_ASSISTANT.NAME}</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/(tabs)/info')} accessibilityRole="button" accessibilityLabel="Medicine Info" accessibilityHint="Navigate to medicine information">
               <View style={styles.actionButtonContent}>
-                <MaterialCommunityIcons
-                  name="information"
-                  size={32}
-                  color={colors.warning[500]}
-                />
+                <View style={styles.actionIconWrap}>
+                  <MaterialCommunityIcons name="information" size={28} color={colors.primary[600]} />
+                </View>
                 <Text style={styles.actionButtonText}>Medicine Info</Text>
               </View>
             </TouchableOpacity>
@@ -600,6 +613,14 @@ const styles = StyleSheet.create({
   actionButtonContent: {
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  actionIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.primary[100],
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   actionButtonText: {
     marginTop: 8,

@@ -256,6 +256,7 @@ export default function InfoScreen() {
             <View style={styles.searchActions}>
               <Button
                 variant="primary"
+                size="md"
                 onPress={() => handleSearch()}
                 disabled={!searchQuery.trim() || loading}
                 style={styles.searchButton}
@@ -263,13 +264,16 @@ export default function InfoScreen() {
               >
                 {loading ? 'Searching...' : 'Search'}
               </Button>
-              <Button
-                variant="secondary"
-                onPress={handleClear}
-                disabled={loading}
-              >
-                Clear
-              </Button>
+              {searchQuery.length > 0 && (
+                <Button
+                  variant="text"
+                  size="md"
+                  onPress={handleClear}
+                  disabled={loading}
+                >
+                  Clear
+                </Button>
+              )}
             </View>
           </Card.Content>
         </Card>

@@ -1,7 +1,8 @@
 // Profile Screen for MediMind AI
 
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Text, Card, Avatar, IconButton, Switch, Divider, ActivityIndicator, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthContext } from '../../src/contexts/AuthContext';
@@ -22,6 +23,13 @@ export default function ProfileScreen() {
   const [editing, setEditing] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const [showDobPicker, setShowDobPicker] = useState(false);
+
+  const parseDob = (dob: string): Date => {
+    const d = dob ? new Date(dob) : new Date();
+    return isNaN(d.getTime()) ? new Date() : d;
+  };
+  const formatDob = (d: Date): string => d.toISOString().slice(0, 10);
   
   const theme = useTheme();
 
@@ -245,14 +253,37 @@ export default function ProfileScreen() {
                 keyboardType="phone-pad"
               />
               
-              <Input
-                label="Date of Birth"
-                value={profileData.date_of_birth}
-                onChangeText={(text) => setProfileData(prev => ({ ...prev, date_of_birth: text }))}
-                disabled={!editing}
-                style={styles.input}
-                placeholder="YYYY-MM-DD"
-              />
+              <Pressable
+                onPress={() => editing && setShowDobPicker(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Date of birth"
+                accessibilityHint={editing ? 'Opens a date picker' : undefined}
+              >
+                <View pointerEvents="none">
+                  <Input
+                    label="Date of Birth"
+                    value={profileData.date_of_birth}
+                    onChangeText={(text) => setProfileData(prev => ({ ...prev, date_of_birth: text }))}
+                    disabled={true}
+                    style={styles.input}
+                    placeholder="YYYY-MM-DD"
+                  />
+                </View>
+              </Pressable>
+              {showDobPicker && (
+                <DateTimePicker
+                  value={parseDob(profileData.date_of_birth)}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  maximumDate={new Date()}
+                  onChange={(_event, selected) => {
+                    setShowDobPicker(Platform.OS === 'ios');
+                    if (selected) {
+                      setProfileData(prev => ({ ...prev, date_of_birth: formatDob(selected) }));
+                    }
+                  }}
+                />
+              )}
             </View>
           </Card.Content>
         </Card>
