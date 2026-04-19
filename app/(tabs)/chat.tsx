@@ -201,6 +201,13 @@ export default function ChatScreen() {
       <ScreenHeader
         title={APP_CONFIG.AI_ASSISTANT.NAME}
         subtitle={APP_CONFIG.AI_ASSISTANT.TAGLINE}
+        left={
+          <Image
+            source={require('../../assets/ai-avatar.png')}
+            style={{ width: 40, height: 40, borderRadius: 20 }}
+            accessibilityLabel="Cura avatar"
+          />
+        }
         right={
           <IconButton
             icon="dots-horizontal"

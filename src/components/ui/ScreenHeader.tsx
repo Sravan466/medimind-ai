@@ -5,14 +5,16 @@ import { colors, spacing, screenTypography } from '../../styles/theme';
 interface ScreenHeaderProps {
   title: string;
   subtitle?: string;
+  left?: React.ReactNode;
   right?: React.ReactNode;
   style?: ViewStyle;
 }
 
-export const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, subtitle, right, style }) => {
+export const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, subtitle, left, right, style }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.row}>
+        {left ? <View style={styles.left}>{left}</View> : null}
         <View style={styles.textWrap}>
           <Text
             style={styles.title}
@@ -60,6 +62,10 @@ const styles = StyleSheet.create({
     ...screenTypography.screenSubtitle,
     color: colors.neutral[600],
     marginTop: 2,
+  },
+  left: {
+    marginRight: spacing.sm + 4,
+    flexShrink: 0,
   },
   right: {
     flexShrink: 0,
